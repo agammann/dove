@@ -1,0 +1,13 @@
+.git
+**/.venv
+**/node_modules
+**/.data
+**/.env
+**/.env.local
+**/.cache
+**/.pnpm
+**/__pycache__
+**/.pytest_cache
+**/test-results
+**/dist
+docs

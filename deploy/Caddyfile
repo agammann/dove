@@ -1,0 +1,7 @@
+{$DOVE_DOMAIN} {
+    request_body {
+        max_size 9MB
+    }
+    reverse_proxy api:8000
+    header Strict-Transport-Security "max-age=31536000"
+}

@@ -1,0 +1,62 @@
+name: dove
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: dove
+      POSTGRES_USER: dove
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dove-password}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dove -d dove"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "127.0.0.1:54329:5432"
+  api:
+    build: .
+    init: true
+    environment: &app-environment
+      DATABASE_URL: postgresql+psycopg://dove:${POSTGRES_PASSWORD:-local-dove-password}@db/dove
+      STORAGE_DIR: /data/objects
+      ENVIRONMENT: ${ENVIRONMENT:-local}
+      SECRET_KEY: ${SECRET_KEY:-local-only-do-not-deploy-change-this-value}
+      PUBLIC_URL: ${PUBLIC_URL:-http://127.0.0.1:8000}
+      MODEL_ADAPTER: ${MODEL_ADAPTER:-fixture}
+      EMAIL_ADAPTER: ${EMAIL_ADAPTER:-local}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_WEBHOOK_SECRET: ${RESEND_WEBHOOK_SECRET:-}
+      EMAIL_FROM: ${EMAIL_FROM:-Dove <dove@example.test>}
+      REPLY_DOMAIN: ${REPLY_DOMAIN:-reply.example.test}
+    command: ["sh", "-c", "python -m alembic upgrade head && python -m uvicorn dove.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
+    ports:
+      - "127.0.0.1:${DOVE_PORT:-8000}:8000"
+    volumes:
+      - objects:/data/objects
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  worker:
+    build: .
+    init: true
+    environment: *app-environment
+    command: ["python", "-m", "dove.worker"]
+    volumes:
+      - objects:/data/objects
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  postgres:
+  objects:
