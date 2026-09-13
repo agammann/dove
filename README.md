@@ -25,7 +25,7 @@ docker compose up --build -d
 docker compose exec api python -m dove.cli seed
 ```
 
-Open [Dove locally](http://127.0.0.1:8000). The default model fixture and email outbox are explicitly simulated. No provider key or external email is needed for local development. PostgreSQL and private objects persist in named volumes; API and worker are separate processes.
+After starting the local stack, open `http://127.0.0.1:8000` in your browser. The default model fixture and email outbox are explicitly simulated. No provider key or external email is needed for local development. PostgreSQL and private objects persist in named volumes; API and worker are separate processes.
 
 | Sample workspace | Email |
 | :--- | :--- |
