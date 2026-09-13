@@ -2,11 +2,19 @@
 
 From completed work to completed paperwork.
 
+**[Visit Dove’s public website](https://dove-paperwork.alx21.chatgpt.site)** · [Request early access](https://dove-paperwork.alx21.chatgpt.site/#access)
+
 Dove helps businesses resolve missing purchase orders, acceptance evidence and approved deliverables before invoicing. It runs one configurable workflow across separate organization workspaces.
 
 ![Dove reviewing fictional source evidence](frontend/public/product-screenshot.png)
 
 Upload readable PDF/TXT documents, inspect proposed requirements and source excerpts, authorize requests to customer contacts, review incoming evidence, and approve an exact billing package before separately authorizing delivery. Provider acceptance is recorded separately from confirmed delivery, customer acceptance and payment.
+
+## Public website
+
+Dove’s public website and working early access form are hosted on OpenAI Sites. The website is available independently of a local development computer. The full document processing workspace in this repository still requires a separate production deployment and live provider setup before customers can sign in.
+
+Website submissions are stored in the Sites database for manual review. They do not create app accounts or send automatic email notifications.
 
 ## Run locally
 
@@ -51,7 +59,7 @@ This removes sample work and recreates the fictional examples. It refuses produc
 
 ## Accounts and operations
 
-The public landing form saves access requests for manual operator review. Account creation requires a private invitation:
+The application’s own landing form saves access requests in its application database for manual operator review. The commands below manage that application database; requests from the public OpenAI Sites website are reviewed separately through Sites. Account creation requires a private invitation:
 
 ```sh
 docker compose exec api python -m dove.cli access-requests
