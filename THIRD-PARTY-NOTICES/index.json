@@ -1419,26 +1419,6 @@
   },
   {
     "ecosystem": "npm",
-    "name": "playwright",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_1.55.0__LICENSE",
-      "playwright_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
-    "name": "@playwright/test",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "_playwright_test_1.55.0__LICENSE",
-      "_playwright_test_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
     "name": "@rolldown/pluginutils",
     "version": "1.0.0-beta.27",
     "license": "MIT",
@@ -1629,15 +1609,6 @@
     "license": "MIT",
     "notices": [
       "react_refresh_0.17.0__LICENSE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
-    "name": "vite",
-    "version": "6.4.1",
-    "license": "MIT",
-    "notices": [
-      "vite_6.4.1__LICENSE.md"
     ]
   },
   {
@@ -2135,26 +2106,6 @@
   },
   {
     "ecosystem": "npm",
-    "name": "playwright",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_1.55.0__LICENSE",
-      "playwright_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
-    "name": "playwright-core",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_core_1.55.0__LICENSE",
-      "playwright_core_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
     "name": "postcss",
     "version": "8.5.28",
     "license": "MIT",
@@ -2545,36 +2496,6 @@
   },
   {
     "ecosystem": "npm",
-    "name": "playwright-core",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_core_1.55.0__LICENSE",
-      "playwright_core_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
-    "name": "playwright",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_1.55.0__LICENSE",
-      "playwright_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
-    "name": "playwright-core",
-    "version": "1.55.0",
-    "license": "Apache-2.0",
-    "notices": [
-      "playwright_core_1.55.0__LICENSE",
-      "playwright_core_1.55.0__NOTICE"
-    ]
-  },
-  {
-    "ecosystem": "npm",
     "name": "nanoid",
     "version": "3.3.18",
     "license": "MIT",
@@ -2850,20 +2771,50 @@
   },
   {
     "ecosystem": "npm",
-    "name": "vite",
-    "version": "6.4.1",
-    "license": "MIT",
-    "notices": [
-      "vite_6.4.1__LICENSE.md"
-    ]
-  },
-  {
-    "ecosystem": "npm",
     "name": "yallist",
     "version": "3.1.1",
     "license": "ISC",
     "notices": [
       "yallist_3.1.1__LICENSE"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "playwright",
+    "version": "1.55.1",
+    "license": "Apache-2.0",
+    "notices": [
+      "playwright_1.55.1__LICENSE",
+      "playwright_1.55.1__NOTICE"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@playwright/test",
+    "version": "1.55.1",
+    "license": "Apache-2.0",
+    "notices": [
+      "_playwright_test_1.55.1__LICENSE",
+      "_playwright_test_1.55.1__NOTICE"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "vite",
+    "version": "6.4.3",
+    "license": "MIT",
+    "notices": [
+      "vite_6.4.3__LICENSE.md"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "playwright-core",
+    "version": "1.55.1",
+    "license": "Apache-2.0",
+    "notices": [
+      "playwright_core_1.55.1__LICENSE",
+      "playwright_core_1.55.1__NOTICE"
     ]
   }
 ]

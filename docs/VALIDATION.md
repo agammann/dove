@@ -1,8 +1,31 @@
 # Dove validation
 
-Observed September 10, 2026, Pacific time. These results concern local source and fictional examples.
+Updated September 19, 2026, Pacific time. These checks use fictional data. The public access website and the local document workspace are separate services.
 
-## Observed evidence
+## September 19 verification
+
+| Check | Result | Boundary |
+| :--- | :--- | :--- |
+| Container SQLite suite | 30 passed, 1 warning, 39.86 seconds | Fixture model and local email |
+| Container PostgreSQL suite | 30 passed, 1 warning, 22.89 seconds | Newly created disposable database, removed afterward |
+| Running HTTP workflow | Passed sign-in, upload, worker processing, request, duplicate reply, human decision, approval, simulated delivery, ZIP download and export | Actual local API, PostgreSQL and independent worker; no live AI or email |
+| Access separation | Foreign work returned 404; foreign signed file download returned 403 | Two fictional organizations |
+| Browser | Sample sign-in, persisted checklist, package details and exact invoice preview rendered | Local app in Chromium |
+| Database recovery fix | Added and inspected `restart: unless-stopped`; database and API healthy | Fixes absent restart policy; no Docker engine outage or host power-loss drill performed |
+| Backup and isolated restore | Passed; six stored objects matched hashes, restored package ZIPs verified | Local backup; no restored worker started; not an off-host disaster recovery drill |
+| Frontend build | TypeScript and Vite passed natively and in Docker; Docker used pnpm 10.16.1 | Vite 6.4.3, Playwright 1.55.1 |
+| Dependency advisories | `pnpm audit` and hash-locked Python requirement audit reported no known vulnerabilities | Package databases at check time; does not audit container OS packages or certify security |
+| Public website | Workflow navigation and access form passed; new fictional request confirmed in hosted D1 database | Records interest only, creates no workspace account and sends no automatic email |
+
+The container test warning is a dependency deprecation of `anyio.abc.BlockingPortal` in Starlette's test client.
+
+The running workflow produced fictional invoice DV-000002 for USD 2400.00. Package ZIP SHA-256: `2e3e2b43b392ca3a6f5a2dbd407f5b00850044b5f96427b1a08baf5626900315`. Its documents and delivery history remained available after the backup stop/start. All outbound attempts used the local outbox; none were sent to a real inbox.
+
+Five frontend development-tool advisories were reported before patching. Updated Vite from 6.4.1 to 6.4.3 and Playwright from 1.55.0 to 1.55.1; the follow-up frontend audit returned zero known advisories. See the upstream [Vite advisory](https://github.com/vitejs/vite/security/advisories/GHSA-fx2h-pf6j-xcff) and [Playwright advisory](https://github.com/advisories/GHSA-7mvr-c777-76hp).
+
+Live OpenAI and Resend credentials were not configured. Live extraction quality, real send/reply/attachment/delivery behavior, public workspace hosting and real participant usability remain unverified. Follow [release gates](RELEASE-CHECKLIST.md) and the [pilot kit](PILOT-KIT.md) before real customer onboarding.
+
+## Historical September 10 evidence
 
 | Check | Result | Boundary |
 | :--- | :--- | :--- |
@@ -25,8 +48,6 @@ Tests cover cross organization reads and mutations, approval invalidation, amoun
 Codex Security completed scan `09ef0b51-214b-464f-905f-2ae9cbaa93c5` against the original unversioned snapshot. The scan warned that files changed during scanning and saved results for the original snapshot. It reported three medium findings: PDF processing availability, unbounded retained file versions and inconsistent outgoing message allowances.
 
 The changed source moves PDF processing into bounded subprocesses outside organization transactions, enforces physical storage and retained version limits, and shares outgoing reservations across requests, packages and retries. Regression tests exercise these changes. The historical scan findings are not automatically closed by local changes. Current source and deployment review remains a release gate.
-
-The scan tool reported 7,317,325 total tokens across five threads, including 6,726,528 cached input tokens. This is aggregate tool reported usage with repeated context, not an estimate of incremental billing. The review excluded a full dependency advisory audit, live providers and production infrastructure.
 
 ## Known limits
 
