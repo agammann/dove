@@ -1,5 +1,7 @@
 # Deployment preparation
 
+For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
+
 The [public website](https://dove-paperwork.alx21.chatgpt.site) is live on OpenAI Sites. The full document workspace in this repository still requires its own deployment. Live provider validation and the [release checklist](RELEASE-CHECKLIST.md) must pass before customer onboarding.
 
 ## Chosen architecture

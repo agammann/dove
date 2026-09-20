@@ -2,7 +2,7 @@
 
 From completed work to completed paperwork.
 
-**[Visit the website](https://dove-paperwork.alx21.chatgpt.site)** · **[Request early access](https://dove-paperwork.alx21.chatgpt.site/#access)**
+**[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace)** · **[Visit the website](https://dove-paperwork.alx21.chatgpt.site)** · **[Request early access](https://dove-paperwork.alx21.chatgpt.site/#access)**
 
 Dove helps service businesses gather missing purchase orders, review acceptance evidence and assemble an approved billing package after the work is finished. Every outgoing request and package requires the appropriate human authorization.
 
@@ -14,11 +14,11 @@ Dove helps service businesses gather missing purchase orders, review acceptance 
 | :--- | :--- |
 | Public website | Live on OpenAI Sites, with a working early access form |
 | Application in this repository | Runnable locally with fictional samples and simulated model and email adapters |
-| Customer workspace | Production deployment and live OpenAI and email verification are still pending |
+| Hosted customer workspace | Live on ChatGPT Sites by invitation, with OpenAI analysis, private documents and package review/download |
 
-The public website is a separate project. Its access requests are stored in Sites; they do not create application accounts or send automatic emails. This repository contains the Python application and its React interface, not the separate Sites website source.
+The hosted website and workspace source is in [sites/](sites/README.md). Its access request form records interest and does not create an account. Start with the [hosted workspace guide](docs/HOSTED-WORKSPACE.md) to use the online app. Outgoing email is unconfigured; automatic incoming email and scheduled reminders are not implemented in the Sites version. The Python sample below remains a separate application.
 
-## Start here
+## Run the local Python sample
 
 Install Git and Docker with the Linux engine and a current Docker Compose plugin. Docker supplies Python, Node and the application dependencies.
 
@@ -46,6 +46,7 @@ Provider acceptance, confirmed email delivery, customer acceptance and payment a
 
 | I want to… | Guide |
 | :--- | :--- |
+| Use the hosted workspace | [Hosted Dove](docs/HOSTED-WORKSPACE.md) |
 | Run the sample and troubleshoot setup | [First run](docs/QUICKSTART.md) |
 | Change code or run checks | [Development](docs/DEVELOPMENT.md) |
 | Review access requests and issue invitations | [Operations](docs/OPERATIONS.md) |
@@ -57,6 +58,7 @@ Provider acceptance, confirmed email delivery, customer acceptance and payment a
 
 | Path | Contents |
 | :--- | :--- |
+| `sites/` | Published Sites website and invitation workspace, migrations and verification tools |
 | `backend/` | FastAPI application, worker, migrations, locked Python dependencies and tests |
 | `frontend/` | React interface, Vite configuration and pnpm lockfile |
 | `deploy/` | Production reverse proxy configuration |

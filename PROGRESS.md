@@ -1,5 +1,7 @@
 # Dove progress
 
+September 19 update: the Sites invitation workspace is published with live OpenAI analysis, private uploads, evidence review, invoice/PDF/ZIP generation and exact package approval. Hosted email remains unconfigured. See [hosted verification and limits](docs/HOSTED-WORKSPACE.md). The source is included in sites/.
+
 Updated September 19, 2026, Pacific time.
 
 The [public website](https://dove-paperwork.alx21.chatgpt.site) is live and accepts early access requests. The [GitHub repository](https://github.com/agammann/dove) contains the separately runnable document workspace. No open source license has been selected for the original code.

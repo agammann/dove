@@ -1,5 +1,7 @@
 # Operations
 
+For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
+
 [Back to Dove](../README.md) · [Documentation](README.md)
 
 Run local commands beside `compose.yaml`. For production, use the same Compose files and environment that started the deployment.

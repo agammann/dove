@@ -1,5 +1,7 @@
 # Dove validation
 
+For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
+
 Updated September 19, 2026, Pacific time. These checks use fictional data. The public access website and the local document workspace are separate services.
 
 ## September 19 verification

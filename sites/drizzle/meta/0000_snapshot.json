@@ -1,0 +1,100 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "2c800ece-9a6e-4d10-a33e-f82a10e68c4a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "access_requests": {
+      "name": "access_requests",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "business": {
+          "name": "business",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "problem": {
+          "name": "problem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "consent": {
+          "name": "consent",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_hash": {
+          "name": "source_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "requests_created_idx": {
+          "name": "requests_created_idx",
+          "columns": [
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "requests_source_created_idx": {
+          "name": "requests_source_created_idx",
+          "columns": [
+            "source_hash",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
