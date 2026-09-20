@@ -51,6 +51,8 @@ Deletion hides the work immediately and removes its stored objects, retrying cle
 - Full npm dependency audit reported zero known advisories after updates; schema generation confirmed no new changes were needed.
 - Sites version 2 deployed successfully from source commit d8eee7a322c1060d33e6697dce93b9b1a4495680 with environment revision 2.
 - Public home and health returned 200; anonymous workspace API and session requests returned 401. Browser ChatGPT authentication reached the invitation screen.
+- The signed-in owner workspace then completed a hosted fictional workflow: upload, live OpenAI analysis with four source-linked proposals, review (including a purchase-order waiver), PDF/ZIP generation, download and exact-version approval. No email was sent. The downloaded invoice PDF was rendered and inspected, and the ZIP manifest and source attachment were checked.
+- Hosted fictional package DV-FF5DD5DC-1 was USD 24.00. Its downloaded ZIP matched the on-screen SHA-256 fingerprint: `6c8b8a9ac1daec2bb7895bfc339a5c6b2feb170464262f17af86dbc34c2e28f7`.
+- GitHub's published Sites source was read back and matched the local source. All 50 repository-local Markdown link targets existed. Existing third-party design/reference links were not all rechecked in this release.
 
 These are engineering checks using fictional documents. They are not real-customer usability results, a load test, a hosted disaster-recovery drill or proof of real email delivery.
-
