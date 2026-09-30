@@ -1,3 +1,5 @@
+> Browser edition: no paid AI API is needed. First use downloads a model and requires WebGPU and sufficient graphics memory. Documents remain in private workspace storage, and all approvals remain human decisions.
+
 # Hosted Dove workspace
 
 [Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace) · [Hosted source and setup](../sites/README.md) · [Back to the repository](../README.md)
@@ -23,7 +25,7 @@ Download the approved ZIP and deliver it through your existing business process.
 | Hosting | Published on ChatGPT Sites | Run locally or deploy to a compatible host |
 | Identity | Sign in with ChatGPT and workspace invitation | Application invitation/password accounts |
 | Records/files | D1 and private R2 | PostgreSQL/SQLite and local object storage |
-| AI | Live OpenAI, server secret | Local fixture by default; optional OpenAI adapter |
+| AI | Browser model on visitor device; no paid AI API | Local fixture by default; optional OpenAI adapter |
 | PDF/TXT upload, evidence review, package approval | Implemented | Implemented |
 | Invoice | Existing PDF or simple confirmed total | Reviewed invoice lines |
 | Outgoing email | Implemented explicit send routes; service unconfigured/unverified | Local outbox by default; optional live provider |
@@ -38,11 +40,13 @@ The site operator creates a workspace using the [private CLI invitation workflow
 
 Secrets belong in the hosting environment and ignored local environment files. The published source and deployment archive contain no API key. Never add a NEXT_PUBLIC_ prefix to provider secrets.
 
-An analysis sends extracted document text to OpenAI. Source quotes are checked against stored pages, and the model cannot approve requirements, authorize contact or send invoices. Adding sources or editing decisions invalidates previous package approvals.
+Analysis processes extracted text in the visitor’s browser. The server validates the submitted source quotes and original work revision before saving proposals. Source quotes are checked against stored pages, and the model cannot approve requirements, authorize contact or send invoices. Adding sources or editing decisions invalidates previous package approvals.
 
 Deletion hides the work immediately and removes its stored objects, retrying cleanup on subsequent workspace visits when storage was temporarily unavailable. Export records and download required binaries before deleting.
 
-## Verification, September 19, 2026
+## Historical provider edition verification, September 19, 2026
+
+These recorded checks describe the earlier hosted model. They do not establish browser-model accuracy or current device compatibility.
 
 - The actual production Worker build passed 16 local HTTP checks with fictional data and live OpenAI calls.
 - Verified anonymous denial, one-time invitation membership, cross-workspace work/file denial, upload bounds, exact source quotes, human review, amount and date checks, PDF extraction, ZIP contents/digest, stale approvals, exact approval and unconfigured-email denial.

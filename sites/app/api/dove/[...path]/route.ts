@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { z } from "zod";
 import { database } from "../../../../db/raw";
-import { uid, now, digest, member, identity, row, save, event, invalidate, validEvidence, requirementInput, analyze, limitedBody, body, sameOrigin, response, failure, need, bucket, invite, throttle, Problem } from "../../../../lib/dove";
+import { uid, now, digest, member, identity, row, save, event, invalidate, validEvidence, requirementInput, validateAnalysis, limitedBody, body, sameOrigin, response, failure, need, bucket, invite, throttle, Problem } from "../../../../lib/dove";
 import { extract, cents, money, invoice, archive } from "../../../../lib/dove-files";
 import type { Work, DocumentRecord, Packet } from "../../../../lib/dove-types";
 export const dynamic="force-dynamic";
@@ -33,7 +33,7 @@ if(p[0]==="accept"&&method==="POST"){
 }
 if(p[0]==="session"&&method==="GET")return response({user:{id:user.userId,name:user.displayName,email:user.email}});
 const {org}=await member();
-if(p[0]==="me"&&method==="GET"){await cleanup(org.id).catch(()=>{});return response({workspace:org,user:{name:user.displayName,email:user.email},integrations:{ai:!!env.OPENAI_API_KEY,email:!!env.RESEND_API_KEY&&!!env.EMAIL_FROM,inbound:false},limits:{fileMB:4,pages:40,documents:10,workspaceMB:64},signout:"/signout-with-chatgpt?return_to=/"})}
+if(p[0]==="me"&&method==="GET"){await cleanup(org.id).catch(()=>{});return response({workspace:org,user:{name:user.displayName,email:user.email},integrations:{ai:true,browser:true,paidInference:false,email:!!env.RESEND_API_KEY&&!!env.EMAIL_FROM,inbound:false},limits:{fileMB:4,pages:40,documents:10,workspaceMB:64},signout:"/signout-with-chatgpt?return_to=/"})}
 if(method!=="GET")await throttle(org.id);
 if(p[0]==="settings"&&method==="PUT"){
  const d=z.object({name:z.string().trim().min(1).max(200),billing:z.string().trim().min(1).max(1500),paused:z.boolean()}).strict().parse(await body(request));await database().prepare("UPDATE dove_workspaces SET name=?,billing=?,paused=? WHERE id=?").bind(d.name,d.billing,d.paused?1:0,org.id).run();return response({ok:true});
@@ -58,9 +58,13 @@ if(p[2]==="document"&&method==="POST"){
  const id=uid(),mime=/\.pdf$/i.test(name)?"application/pdf":"text/plain";await storeFile(org.id,w.id,id,name,mime,bytes);const d:DocumentRecord={id,name,mime,size:bytes.length,pages,approved:false};w.documents.push(d);invalidate(w);event(w,user.email,"Document uploaded: "+name+". Checklist and package approvals require review.");for(const r of w.requirements)r.status="received";try{await save(org.id,w,v)}catch(e){await removeFile(org.id,id).catch(()=>{});throw e}return response(w)
 }
 if(p[2]==="analyze"&&method==="POST"){
- need(!w.paused&&!org.paused,"Resume automation in Settings and on this work item first.",409);need(w.calls<20,"This work item has reached its AI call allowance.",409);need(w.documents.length,"Upload a document first.");await throttle(org.id,"ai");w.calls++;w.status="Analyzing";event(w,user.email,"AI analysis requested. Existing decisions will be replaced only after a valid result.");await save(org.id,w,v);
- try{const proposed=await analyze(w);w.requirements=proposed;invalidate(w);event(w,"Dove","AI proposed "+proposed.length+" source-linked requirements. Human review is required.");await save(org.id,w,v+1);return response(w)}catch(e){const latest=await active(org.id,w.id);if(latest.version===v+1){latest.work.status="Review required";event(latest.work,"Dove","Analysis did not finish. Saved documents and prior checklist retained.");await save(org.id,latest.work,latest.version)}throw e}
+ need(!w.paused&&!org.paused,"Resume automation in Settings and on this work item first.",409);
+ const data=z.object({revision:z.number().int(),requirements:z.unknown()}).strict().parse(await body(request,128000));
+ need(data.revision===w.revision,"This work changed during analysis. Refresh and analyze the current documents.",409);
+ const proposed=validateAnalysis(w,{requirements:data.requirements});
+ w.requirements=proposed;invalidate(w);event(w,user.email,"Saved "+proposed.length+" source-linked browser proposals. Human review is required.");await save(org.id,w,v);return response(w);
 }
+
 if(p[2]==="requirement"&&method==="PUT"){
  const data=z.object({id:z.string().uuid().optional(),requirement:requirementInput}).strict().parse(await body(request));const r=data.requirement;need(r.status==="waived"||r.evidence.length>0,"Attach source evidence or explicitly waive this requirement.");need(r.evidence.every(e=>validEvidence(w,e)),"Source quote must match the chosen document and page.");need(w.requirements.length<30||data.id,"Requirement limit reached.");const pos=w.requirements.findIndex(x=>x.id===data.id);need(!data.id||pos>=0,"Requirement not found.",404);const item={...r,id:data.id||uid(),reviewedBy:user.email};if(pos>=0)w.requirements[pos]=item;else w.requirements.push(item);invalidate(w);w.status=w.requirements.every(x=>["satisfied","waived"].includes(x.status))?"Ready to package":"Review required";event(w,user.email,r.title+": "+r.status+". "+r.reason);await save(org.id,w,v);return response(w)
 }

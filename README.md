@@ -14,9 +14,9 @@ Dove helps service businesses gather missing purchase orders, review acceptance 
 | :--- | :--- |
 | Public website | Live on OpenAI Sites, with a working early access form |
 | Application in this repository | Runnable locally with fictional samples and simulated model and email adapters |
-| Hosted customer workspace | Live on ChatGPT Sites by invitation, with OpenAI analysis, private documents and package review/download |
+| Hosted customer workspace | Live on ChatGPT Sites by invitation, with browser model analysis, private documents and package review/download |
 
-The hosted website and workspace source is in [sites/](sites/README.md). Its access request form records interest and does not create an account. Start with the [hosted workspace guide](docs/HOSTED-WORKSPACE.md) to use the online app. Outgoing email is unconfigured; automatic incoming email and scheduled reminders are not implemented in the Sites version. The Python sample below remains a separate application.
+The hosted website and workspace source is in [sites/](sites/README.md). Its access request form records interest and does not create an account. Hosted document analysis now runs on the visitor’s device without a paid AI API. First use requires browser model downloads, WebGPU and compatible graphics hardware; saved proposals still require exact source quotes and human review. Start with the [hosted workspace guide](docs/HOSTED-WORKSPACE.md) to use the online app. Outgoing email is unconfigured; automatic incoming email and scheduled reminders are not implemented in the Sites version. The Python sample below remains a separate application.
 
 ## Run the local Python sample
 

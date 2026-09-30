@@ -42,9 +42,12 @@ check("private document stored and extracted")
 assert call("file/"+doc["id"]).content==source.encode()
 call(path+"requirement","PUT",{"requirement":{"title":"Bad quote","category":"custom","status":"satisfied","reason":"Test incorrect evidence","evidence":[{"documentId":doc["id"],"page":1,"quote":"This is invented."}]}},400)
 check("invented evidence rejected")
-w=call(path+"analyze","POST")
+call(path+"analyze","POST",{"revision":w["revision"]-1,"requirements":[]},409)
+call(path+"analyze","POST",{"revision":w["revision"],"requirements":[{"title":"Invented","category":"custom","status":"received","reason":"Invalid fictional proposal.","evidence":[{"documentId":doc["id"],"page":1,"quote":"Invented source quote."}]}]},400)
+proposals=[{"title":"Billing amount","category":"amount","status":"received","reason":"Source specifies the total; operator review is required.","evidence":[{"documentId":doc["id"],"page":1,"quote":"The final billing amount is USD 2400.00, including all applicable taxes."}]}]
+w=call(path+"analyze","POST",{"revision":w["revision"],"requirements":proposals})
 assert w["requirements"] and all(r["status"] in ["received","missing","conflict"] for r in w["requirements"])
-check("live OpenAI returned source-verified proposals without auto-approval")
+check("browser proposal save verifies revision and source quotes without auto-approval")
 for req in w["requirements"]:
     payload={k:req[k] for k in ("title","category","status","reason","evidence")}
     payload.update(status="satisfied",reason="Fictional test: operator checked the cited source and confirmed this requirement.")
@@ -106,5 +109,5 @@ if built:
     previous_headers=dict(s.headers); s.close(); s=requests.Client(trust_env=False,headers=previous_headers)
     assert call("work/"+wid)["packages"][0]["approved"]
     check("failed upload preserves approved package")
-(root/"outputs/dove-sites-verification.json").write_text(json.dumps({"checks":checks,"work_id":wid,"org_id":admin["org"],"package_digest":p["digest"],"requirements":len(w["requirements"]),"live_ai":True},indent=2),encoding="utf-8")
+(root/"outputs/dove-sites-verification.json").write_text(json.dumps({"checks":checks,"work_id":wid,"org_id":admin["org"],"package_digest":p["digest"],"requirements":len(w["requirements"]),"browser_proposal_fixture":True,"test_email":email,"test_user_id":s.headers.get("oai-authenticated-user-id")},indent=2),encoding="utf-8")
 print("VERIFIED",len(checks),"checks",flush=True)
