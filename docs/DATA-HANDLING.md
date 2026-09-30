@@ -1,5 +1,7 @@
 # Data handling and retention
 
+This document describes the separate Python application. The published no-login browser workspace uses local storage and no paid AI API; see [browser workspace](HOSTED-WORKSPACE.md).
+
 This is an implementation description, not a compliance certification or a promise of confidentiality beyond the configured deployment.
 
 ## Data and destinations

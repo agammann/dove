@@ -1,6 +1,6 @@
 # Operations
 
-For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
+For the published no-login browser workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
 [Back to Dove](../README.md) · [Documentation](README.md)
 
@@ -10,7 +10,7 @@ Run local commands beside `compose.yaml`. For production, use the same Compose f
 
 | Source | Review location |
 | :--- | :--- |
-| Public OpenAI Sites website | Owner access to the site's `access_requests` database table in Sites |
+| Earlier Sites access requests (historical only) | Retained owner-only records; the browser website no longer collects requests |
 | Landing page served by this Python app | Application database through the CLI |
 
 Neither form creates an account automatically. The public site sends no automatic email notifications and does not copy submissions into the app database. Review deletion requests and retention according to its data notice.

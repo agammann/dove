@@ -1,0 +1,75 @@
+import { chromium } from "playwright";
+import { build } from "esbuild";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import assert from "node:assert/strict";
+
+const base=process.env.DOVE_TEST_URL||"http://127.0.0.1:5174";
+assert(["http://127.0.0.1:5174","http://localhost:5173"].includes(base),"Use a local Dove preview.");
+await mkdir("outputs",{recursive:true});
+const bundled=await build({stdin:{contents:'export * from "./lib/dove-local"; export * from "./lib/dove-storage"; export * from "./lib/dove-backup"; export * from "./lib/dove-files";',resolveDir:process.cwd(),loader:"ts"},bundle:true,format:"iife",globalName:"doveTest",platform:"browser",write:false,target:"es2022"});
+const browser=await chromium.launch({channel:process.env.DOVE_TEST_CHANNEL||"msedge",headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
+const page=await context.newPage(),errors=[],transmissions=[],checks=[];
+page.on("pageerror",error=>errors.push(error.message));
+page.on("request",r=>{if(r.method()!=="GET"||/auth\.openai|api\.openai|\/api\/dove\//.test(r.url()))transmissions.push({url:r.url(),method:r.method()})});
+function pass(name){checks.push(name);console.log("PASS",name)}
+try{
+ await page.goto(base+"/workspace");await page.getByRole("heading",{name:"Good work. Ready to wrap up."}).waitFor();
+ assert.equal(new URL(page.url()).pathname,"/workspace");assert.equal(await page.getByText("Sign out",{exact:true}).count(),0);pass("workspace opens without an account or authentication redirect");
+ await page.addScriptTag({content:bundled.outputFiles[0].text});
+ const core=await page.evaluate(async()=>{
+  const {localApi:api,readState,commit,readFile,extract}=window.doveTest,results=[];
+  const check=(name,ok)=>{if(!ok)throw Error(name);results.push(name)};
+  const rejects=async(task,pattern)=>{try{await task();return false}catch(e){return pattern.test(e.message)}};
+  await api("settings","PUT",{name:"Fictional Studio",billing:"100 Example Lane. Payment due in 30 days.",paused:false});
+  let w=await api("work","POST",{title:"Fictional brand handoff",customer:"Example Customer",contactName:"Fictional Contact",email:"contact@example.invalid",authorized:true,currency:"USD",description:"Brand identity delivered and accepted."});
+  const path="work/"+w.id+"/";
+  check("unreviewed work cannot be packaged",await rejects(()=>api(path+"package","POST",{}),/review every requirement/));
+  const text="Fictional completion record. The final billing amount is USD 2400.00, including all applicable taxes. Example Customer accepts the delivered work in full. Purchase order PO-1042 must accompany the invoice.";
+  const form=new FormData();form.set("file",new File([text],"Agreement.txt",{type:"text/plain"}));w=await api(path+"document","POST",form);
+  const doc=w.documents[0];check("original document and source text persist locally",new TextDecoder().decode((await readFile(doc.id)).bytes)===text);
+  const ev=[{documentId:doc.id,page:1,quote:"The final billing amount is USD 2400.00, including all applicable taxes."}];
+  const proposal={title:"Billing amount",category:"amount",status:"received",reason:"Check the source total before approving.",evidence:ev};
+  check("stale analysis cannot overwrite new work",await rejects(()=>api(path+"analyze","POST",{revision:w.revision-1,requirements:[proposal]}),/changed during analysis/));
+  check("invented model quotes are rejected",await rejects(()=>api(path+"analyze","POST",{revision:w.revision,requirements:[{...proposal,evidence:[{...ev[0],quote:"Invented amount"}]}]}),/unverified quote/));
+  w=await api(path+"analyze","POST",{revision:w.revision,requirements:[proposal]});check("model proposals cannot approve work",w.requirements[0].status==="received");
+  w=await api(path+"requirement","PUT",{id:w.requirements[0].id,requirement:{...proposal,status:"satisfied",reason:"Operator verified the quoted source amount."}});
+  check("human review resolves the checklist",w.status==="Ready to package");
+  const pkg={total:"2400.00",issue:"2026-09-30",due:"2026-10-30",summary:"Fictional brand handoff delivered and accepted.",evidence:ev,documents:[doc.id],confirmed:true};
+  check("unsupported totals are rejected",await rejects(()=>api(path+"package","POST",{...pkg,total:"9900.00"}),/total must appear/));
+  check("invalid invoice dates are rejected",await rejects(()=>api(path+"package","POST",{...pkg,issue:"2026-02-31"}),/valid issue/));
+  w=await api(path+"package","POST",pkg);const packet=w.packages[0];
+  const pdf=await readFile(packet.pdfId);check("generated invoice PDF extracts correctly in the browser",(await extract(pdf.bytes,pdf.name)).join(" ").includes("2400.00"));
+  w=await api(path+"approve","POST",{id:packet.id,digest:packet.digest,authorize:true});check("exact package approval is saved",w.packages[0].approved);
+  const before=await readState();await api("settings","PUT",{name:"Fictional Studio",billing:"100 Example Lane. Payment due in 30 days.",paused:false});
+  check("concurrent stale saves cannot overwrite current storage",await rejects(()=>commit(before),/another tab/));
+  const form2=new FormData();form2.set("file",new File(["Additional fictional acceptance record."],"Acceptance.txt",{type:"text/plain"}));
+  w=await api(path+"document","POST",form2);check("new source invalidates package approvals",!w.packages[0].approved);
+  check("outdated package cannot be approved",await rejects(()=>api(path+"approve","POST",{id:packet.id,digest:packet.digest,authorize:true}),/package changed/));
+  w=await api(path+"requirement","PUT",{id:w.requirements[0].id,requirement:{...proposal,status:"missing",reason:"A separate written confirmation is still needed."}});
+  w=await api(path+"request","POST",{requirements:[w.requirements[0].id],body:"Please confirm the final billing amount in writing."});
+  check("missing-document requests save as unsent drafts",w.requests[0].status==="draft_not_sent");
+  w=await api(path+"reply","POST",{requestId:w.requests[0].id,sender:w.email,text:"Fictional customer confirms the final billing amount is USD 2400.00.",verified:true});
+  check("verified replies become local source documents",w.requests[0].status==="reply_recorded"&&w.documents.length===3&&w.requirements[0].status==="received");
+  window.fixture={id:w.id,docId:doc.id,packetId:packet.id,digest:packet.digest};return results;
+ });core.forEach(pass);
+ await page.reload();await page.getByRole("button",{name:/Fictional brand handoff/}).click();pass("saved work survives reload");
+ await page.getByRole("tab",{name:/Package/}).click();
+ const downloadPromise=page.waitForEvent("download");await page.getByRole("button",{name:"Download package ZIP"}).click();const zip=await downloadPromise;await zip.saveAs(resolve("outputs/dove-browser-package.zip"));pass("package ZIP downloads through the actual interface");
+ await page.getByRole("button",{name:"Settings",exact:true}).click();const backupPromise=page.waitForEvent("download");await page.getByRole("button",{name:"Export complete backup"}).click();const backup=await backupPromise;const backupPath=resolve("outputs/dove-browser-backup.zip");await backup.saveAs(backupPath);pass("complete backup downloads through Settings");
+ await page.addScriptTag({content:bundled.outputFiles[0].text});
+ await page.evaluate(async()=>{const s=await window.doveTest.readState();for(const w of s.work)await window.doveTest.localApi("work/"+w.id,"DELETE");});
+ page.once("dialog",d=>d.accept());await page.getByLabel("Complete Dove backup ZIP").setInputFiles(backupPath);await page.getByRole("button",{name:"Restore backup",exact:true}).click();await page.getByRole("status").filter({hasText:"Backup restored"}).waitFor();
+ const restored=await page.evaluate(async()=>{const {state,files}=await window.doveTest.snapshot();return {count:state.work.length,files:files.length,approved:state.work[0]?.packages[0]?.approved}});
+ assert.equal(restored.count,1);assert.equal(restored.files,5);assert.equal(restored.approved,false);pass("backup restores records and all original/package files with renewed package review");
+ const unchanged=await page.evaluate(async()=>{
+  const before=await window.doveTest.readState();try{await window.doveTest.importBackup(new File(["invalid backup"],"bad.zip"))}catch{}return JSON.stringify(before)===JSON.stringify(await window.doveTest.readState());
+ });assert(unchanged);pass("invalid backup leaves current work unchanged");
+ await page.getByRole("button",{name:"Work",exact:true}).click();await page.getByRole("button",{name:/Fictional brand handoff/}).click();
+ await page.screenshot({path:"outputs/dove-browser-workspace.png",fullPage:true});
+ const isolated=await browser.newContext();const p2=await isolated.newPage();await p2.goto(base+"/workspace");await p2.getByRole("heading",{name:"A clean slate."}).waitFor();await isolated.close();pass("a separate browser profile starts with its own empty workspace");
+ assert.deepEqual(errors,[]);assert.deepEqual(transmissions,[]);pass("workspace workflow makes no API calls or authentication requests");
+ await writeFile("outputs/dove-browser-verification.json",JSON.stringify({checks,errors,transmissions},null,2));
+ console.log(`${checks.length} checks passed.`);
+}finally{await browser.close()}

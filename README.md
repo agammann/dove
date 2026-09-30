@@ -2,21 +2,25 @@
 
 From completed work to completed paperwork.
 
-**[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace)** · **[Visit the website](https://dove-paperwork.alx21.chatgpt.site)** · **[Request early access](https://dove-paperwork.alx21.chatgpt.site/#access)**
+**[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace)** · **[Visit the website](https://dove-paperwork.alx21.chatgpt.site)** · **[Browser workspace guide](docs/HOSTED-WORKSPACE.md)**
 
-Dove helps service businesses gather missing purchase orders, review acceptance evidence and assemble an approved billing package after the work is finished. Every outgoing request and package requires the appropriate human authorization.
+Dove helps service businesses gather missing purchase orders, review acceptance evidence and assemble an approved billing package after the work is finished. The published browser workspace needs no login, ChatGPT account or paid AI API. Documents and work are saved on the visitor’s device.
 
-![Dove reviewing fictional source evidence](frontend/public/product-screenshot.png)
+![Dove browser workspace with fictional documents](sites/public/product-screenshot.png)
 
 ## What is available
 
 | Part | Status |
 | :--- | :--- |
-| Public website | Live on OpenAI Sites, with a working early access form |
+| Public website | Live, with direct access to the browser workspace |
 | Application in this repository | Runnable locally with fictional samples and simulated model and email adapters |
-| Hosted customer workspace | Live on ChatGPT Sites by invitation, with browser model analysis, private documents and package review/download |
+| Browser workspace | No login; local documents, browser model analysis, evidence review, PDF/ZIP packages and complete backup export/import |
 
-The hosted website and workspace source is in [sites/](sites/README.md). Its access request form records interest and does not create an account. Hosted document analysis now runs on the visitor’s device without a paid AI API. First use requires browser model downloads, WebGPU and compatible graphics hardware; saved proposals still require exact source quotes and human review. Start with the [hosted workspace guide](docs/HOSTED-WORKSPACE.md) to use the online app. Outgoing email is unconfigured; automatic incoming email and scheduled reminders are not implemented in the Sites version. The Python sample below remains a separate application.
+The published website source is in [sites/](sites/README.md). Open it and start: no account or invitation is required. Files, extracted text and decisions stay in IndexedDB in that browser profile. First-time model analysis downloads public model assets and requires WebGPU and enough graphics memory; manual review and packaging work without loading a model.
+
+**Back up your work in Settings.** Export includes original files and packages; restore replaces the local workspace and requires renewed package approval. Clearing browser data can erase saved work. There is no automatic sync, teammate access or email delivery. Backup ZIPs and local records are not encrypted by Dove. See the [browser workspace guide](docs/HOSTED-WORKSPACE.md).
+
+The Python sample below remains a separate implementation with its own accounts and optional providers. Existing hosted records were not deleted or made public by the browser migration.
 
 ## Run the local Python sample
 
@@ -33,7 +37,7 @@ Run the seed command only after startup succeeds. Open `http://127.0.0.1:8000`, 
 
 If port 8000 is occupied, configure an alternate port **before startup** using the [first run guide](docs/QUICKSTART.md#choose-a-local-address). That guide covers prerequisites, sample accounts, expected health output, the walkthrough, stopping the app and troubleshooting.
 
-## The workflow
+## Separate Python sample workflow
 
 1. **Gather:** Upload readable PDF or TXT documents for a completed job.
 2. **Review:** Inspect proposed requirements beside source excerpts and resolve conflicting evidence.
@@ -49,7 +53,7 @@ Provider acceptance, confirmed email delivery, customer acceptance and payment a
 | Use the hosted workspace | [Hosted Dove](docs/HOSTED-WORKSPACE.md) |
 | Run the sample and troubleshoot setup | [First run](docs/QUICKSTART.md) |
 | Change code or run checks | [Development](docs/DEVELOPMENT.md) |
-| Review access requests and issue invitations | [Operations](docs/OPERATIONS.md) |
+| Operate the separate Python application | [Operations](docs/OPERATIONS.md) |
 | Prepare a production host and backups | [Deployment](docs/DEPLOYMENT.md) |
 | Understand implementation and data handling | [Documentation index](docs/README.md) |
 | Review evidence and unfinished release work | [Validation](docs/VALIDATION.md), [release checklist](docs/RELEASE-CHECKLIST.md), [progress](PROGRESS.md) |
@@ -58,7 +62,7 @@ Provider acceptance, confirmed email delivery, customer acceptance and payment a
 
 | Path | Contents |
 | :--- | :--- |
-| `sites/` | Published Sites website and invitation workspace, migrations and verification tools |
+| `sites/` | Published browser workspace, backup tools, retained legacy migrations and verification |
 | `backend/` | FastAPI application, worker, migrations, locked Python dependencies and tests |
 | `frontend/` | React interface, Vite configuration and pnpm lockfile |
 | `deploy/` | Production reverse proxy configuration |

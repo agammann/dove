@@ -1,6 +1,6 @@
 # Invitation beta release checklist
 
-For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
+For the published no-login browser workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
 The documented local fixture workflow is verified. The application is not deployed or cleared for real customer onboarding.
 

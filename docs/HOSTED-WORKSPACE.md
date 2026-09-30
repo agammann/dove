@@ -1,62 +1,43 @@
-> Browser edition: no paid AI API is needed. First use downloads a model and requires WebGPU and sufficient graphics memory. Documents remain in private workspace storage, and all approvals remain human decisions.
+# Dove browser workspace
 
-# Hosted Dove workspace
+[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace) · [Source and setup](../sites/README.md) · [Repository](../README.md)
 
-[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace) · [Hosted source and setup](../sites/README.md) · [Back to the repository](../README.md)
-
-Dove's invitation workspace is hosted on ChatGPT Sites and remains available when the developer's computer is off. The public website and workspace share the same address. ChatGPT sign-in identifies the user; a single-use invitation separately grants workspace membership.
+Dove opens without a login, ChatGPT account, invitation or paid AI API. Hosting serves the website; the workspace and document processing run in the visitor’s browser.
 
 ## First use
 
-1. Sign in and redeem the invitation provided by the operator.
-2. Open Settings. Save the business name and billing details, then resume automation.
-3. Create a work item and verify its billing contact.
-4. Upload text-readable PDF/TXT sources, then select Analyze documents.
-5. Review the exact source quotes and make the checklist decisions.
-6. Assemble a simple invoice or attach an existing invoice PDF. Confirm the source-supported amount and include the supporting documents.
-7. Review the actual PDF and ZIP, then approve the exact version.
+1. Open the workspace and enter business/billing details in Settings.
+2. Create a work item and verify its customer billing contact. The email field identifies the invoice recipient, not an account.
+3. Add readable PDF/TXT sources. Analyze them using a local browser model or enter source-linked requirements manually.
+4. Review source quotes and make checklist decisions. Save request drafts for your own email and record replies you have verified.
+5. Assemble an invoice and supporting package using a source-supported total.
+6. Download and inspect the actual PDF and ZIP, then approve the exact version.
+7. Deliver through your own process and export a complete backup from Settings.
 
-Download the approved ZIP and deliver it through your existing business process. Outgoing email is not configured on the published site. Automatic incoming-email processing and scheduled reminders are not implemented in this hosted version.
+## What changed
 
-## Two implementations
-
-| Capability | Sites workspace | Python application |
+| Capability | Published browser workspace | Separate Python application |
 | :--- | :--- | :--- |
-| Hosting | Published on ChatGPT Sites | Run locally or deploy to a compatible host |
-| Identity | Sign in with ChatGPT and workspace invitation | Application invitation/password accounts |
-| Records/files | D1 and private R2 | PostgreSQL/SQLite and local object storage |
-| AI | Browser model on visitor device; no paid AI API | Local fixture by default; optional OpenAI adapter |
-| PDF/TXT upload, evidence review, package approval | Implemented | Implemented |
-| Invoice | Existing PDF or simple confirmed total | Reviewed invoice lines |
-| Outgoing email | Implemented explicit send routes; service unconfigured/unverified | Local outbox by default; optional live provider |
-| Incoming email and reminders | Manual document/reply handling; no automatic scheduler | Worker and provider-integration workflow; live email still unverified |
-| Backup/restore | Record export and individual file downloads; full recovery workflow pending | Backup script and isolated restore verification |
+| Accounts | None | Invitation/password accounts |
+| Records/files | IndexedDB in the current browser profile | PostgreSQL/SQLite and object storage |
+| Model | Browser WebGPU model; no paid AI API | Fixture adapter by default; optional provider adapter |
+| Evidence review and package approval | Local, human decisions | Server-backed, human decisions |
+| Email | Save drafts and download packages; send through your own email | Local outbox by default; optional live provider |
+| Backup | Complete ZIP export/import in Settings | Operator backup and isolated restore scripts |
+| Collaboration | No shared workspace or automatic sync | Organization membership |
 
-The Python sample and Sites workspace do not share accounts, documents or access requests. The public interest form creates neither type of account.
+## Protect saved work
 
-## Operator access and data
+Clearing site data, using private browsing, changing profiles or browser storage eviction can remove local records. Anyone with access to that browser profile can open them. Dove does not encrypt records or backup ZIPs. Keep backups in a private location outside browser storage.
 
-The site operator creates a workspace using the [private CLI invitation workflow](../sites/README.md#production-operations). Use the customer's ChatGPT email to bind an invitation. All workspace members can read its files and make approval decisions; granular roles are not implemented.
+**Export complete backup** includes originals, extracted text, decisions, invoices and package ZIPs. **Restore backup** validates the file index and hashes before replacing the local workspace. Export current work first. Restored packages require renewed approval. Backups are not authenticated audit records.
 
-Secrets belong in the hosting environment and ignored local environment files. The published source and deployment archive contain no API key. Never add a NEXT_PUBLIC_ prefix to provider secrets.
+First model use downloads assets from public hosts and requires WebGPU and sufficient graphics memory. There is no paid fallback. Document text is processed locally; hosting and asset hosts may process ordinary request metadata. Read [limits and development instructions](../sites/README.md).
 
-Analysis processes extracted text in the visitor’s browser. The server validates the submitted source quotes and original work revision before saving proposals. Source quotes are checked against stored pages, and the model cannot approve requirements, authorize contact or send invoices. Adding sources or editing decisions invalidates previous package approvals.
+## Legacy hosted data
 
-Deletion hides the work immediately and removes its stored objects, retrying cleanup on subsequent workspace visits when storage was temporarily unavailable. Export records and download required binaries before deleting.
+The browser release retains the old D1/R2 resources and migrations. It does not publish, delete or automatically copy earlier hosted records. Old workspace and access-request routes are retired with HTTP 410. Recovery of legacy records requires a separate owner-controlled export, not a public endpoint or an unverified email claim. Old records-only JSON exports cannot restore original binaries and are not accepted as complete browser backups.
 
-## Historical provider edition verification, September 19, 2026
+## Verification
 
-These recorded checks describe the earlier hosted model. They do not establish browser-model accuracy or current device compatibility.
-
-- The actual production Worker build passed 16 local HTTP checks with fictional data and live OpenAI calls.
-- Verified anonymous denial, one-time invitation membership, cross-workspace work/file denial, upload bounds, exact source quotes, human review, amount and date checks, PDF extraction, ZIP contents/digest, stale approvals, exact approval and unconfigured-email denial.
-- Fixed rejected-request body handling after observing dropped local proxy connections; the full checks then passed.
-- TypeScript and production build passed. ESLint passed with one existing screenshot optimization warning.
-- Full npm dependency audit reported zero known advisories after updates; schema generation confirmed no new changes were needed.
-- Sites version 2 deployed successfully from source commit d8eee7a322c1060d33e6697dce93b9b1a4495680 with environment revision 2.
-- Public home and health returned 200; anonymous workspace API and session requests returned 401. Browser ChatGPT authentication reached the invitation screen.
-- The signed-in owner workspace then completed a hosted fictional workflow: upload, live OpenAI analysis with four source-linked proposals, review (including a purchase-order waiver), PDF/ZIP generation, download and exact-version approval. No email was sent. The downloaded invoice PDF was rendered and inspected, and the ZIP manifest and source attachment were checked.
-- Hosted fictional package DV-FF5DD5DC-1 was USD 24.00. Its downloaded ZIP matched the on-screen SHA-256 fingerprint: `6c8b8a9ac1daec2bb7895bfc339a5c6b2feb170464262f17af86dbc34c2e28f7`.
-- GitHub's published Sites source was read back and matched the local source. All 50 repository-local Markdown link targets existed. Existing third-party design/reference links were not all rechecked in this release.
-
-These are engineering checks using fictional documents. They are not real-customer usability results, a load test, a hosted disaster-recovery drill or proof of real email delivery.
+September 30, 2026: 23 local browser checks passed, covering no-login entry, durable local storage, source/revision checks, invoice PDF extraction, package approval, ZIP download, complete backup restoration, invalid-backup rollback and isolation between browser profiles. The workflow made no workspace API or authentication requests. Real model generation is checked separately from these fictional proposal fixtures.

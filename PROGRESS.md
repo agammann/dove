@@ -1,5 +1,9 @@
 # Dove progress
 
+September 30, 2026: the published website now uses a browser-only workspace with no account or paid AI API, complete ZIP backup/restore and local document/package storage. The early-access form and invitation requirement are removed. See [current browser guide](docs/HOSTED-WORKSPACE.md).
+
+## Historical September 19 notes
+
 September 19 update: the Sites invitation workspace is published with live OpenAI analysis, private uploads, evidence review, invoice/PDF/ZIP generation and exact package approval. Hosted email remains unconfigured. See [hosted verification and limits](docs/HOSTED-WORKSPACE.md). The source is included in sites/.
 
 Updated September 19, 2026, Pacific time.

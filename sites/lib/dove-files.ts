@@ -1,7 +1,7 @@
 import { getDocumentProxy } from "unpdf";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { zipSync, strToU8 } from "fflate";
-import { need, Problem } from "./dove";
+import { need, Problem } from "./dove-core";
 export async function extract(bytes:Uint8Array,name:string){need(bytes.length>0&&bytes.length<=4*1024*1024,"Use a PDF or TXT file up to 4 MB.",413);let pages:string[];if(/\.pdf$/i.test(name)){need(new TextDecoder().decode(bytes.slice(0,5))==="%PDF-","The file is not a readable PDF.");const pdf=await getDocumentProxy(bytes.slice(),{useWasm:false});try{need(pdf.numPages<=40,"PDFs must have no more than 40 pages.");pages=[];for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const text=await p.getTextContent();pages.push(text.items.map(x=>"str" in x?x.str+("hasEOL" in x&&x.hasEOL?"\n":" "):"").join(""));p.cleanup();need(pages.join("").length<=100000,"This document contains too much text.");}}finally{await pdf.loadingTask.destroy()}}else{need(/\.txt$/i.test(name),"Upload PDF or TXT documents only.");const text=new TextDecoder("utf-8",{fatal:true}).decode(bytes);need(!text.includes("\0"),"This is not a readable text file.");pages=[text]}need(pages.join("").trim().length>=10,"No readable text found. Scanned documents require a text-readable PDF.");need(pages.join("").length<=100000,"This document contains too much text.");return pages}
 export function cents(value:string){need(/^\d{1,9}(\.\d{1,2})?$/.test(value),"Enter a nonnegative amount with up to two decimals.");const [a,b=""]=value.split(".");return Number(a)*100+Number(b.padEnd(2,"0"))}
 export const money=(n:number)=>(n/100).toFixed(2);

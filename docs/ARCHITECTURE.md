@@ -1,5 +1,7 @@
 # Dove architecture
 
+This document describes the separate Python application. The published no-login browser workspace uses local storage and no paid AI API; see [browser workspace](HOSTED-WORKSPACE.md).
+
 Dove runs one configurable paperwork workflow for every business type. The React application is served by FastAPI on the same origin. PostgreSQL stores organization-scoped records, jobs, invitations, sessions and immutable package metadata. A separate Python worker polls durable jobs. Private document objects use opaque keys on a persistent volume outside the web root; they are never served as static files. Five-minute download tokens also require the same authenticated user and organization.
 
 ## Domain records

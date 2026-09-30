@@ -4,6 +4,7 @@
 
 | Guide | Purpose |
 | :--- | :--- |
+| [Browser workspace](HOSTED-WORKSPACE.md) | No-login website, local documents, backups and limits |
 | [First run](QUICKSTART.md) | Setup, fictional sample walkthrough and troubleshooting |
 | [Development](DEVELOPMENT.md) | Rebuilds, isolated tests and native development |
 | [Operations](OPERATIONS.md) | Access requests, invitations, health and recovery |
@@ -15,4 +16,4 @@
 | [Pilot kit](PILOT-KIT.md) | Interviews, feedback and pilot measurement |
 | [Progress](../PROGRESS.md) | Current status |
 
-The [public website](https://dove-paperwork.alx21.chatgpt.site) is hosted separately. Its access form records interest, not a customer account.
+The [public website](https://dove-paperwork.alx21.chatgpt.site) is hosted separately. Its workspace opens without an account and saves documents in the visitor’s browser. See [browser storage and backups](HOSTED-WORKSPACE.md).
