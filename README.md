@@ -4,7 +4,7 @@ From completed work to completed paperwork.
 
 **[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace)** · **[Visit the website](https://dove-paperwork.alx21.chatgpt.site)** · **[Browser workspace guide](docs/HOSTED-WORKSPACE.md)**
 
-Dove helps service businesses gather missing purchase orders, review acceptance evidence and assemble an approved billing package after the work is finished. The published browser workspace needs no login, ChatGPT account or paid AI API. Documents and work are saved on the visitor’s device.
+Dove helps service businesses gather missing purchase orders, review acceptance evidence and assemble an approved billing package after the work is finished. The browser workspace needs no login or ChatGPT account. Documents and work are saved on the visitor’s device. Device analysis and manual review require no API key; optional hosted analysis uses the visitor’s own OpenAI key and API billing.
 
 ![Dove browser workspace with fictional documents](sites/public/product-screenshot.png)
 
@@ -14,9 +14,9 @@ Dove helps service businesses gather missing purchase orders, review acceptance 
 | :--- | :--- |
 | Public website | Live, with direct access to the browser workspace |
 | Application in this repository | Runnable locally with fictional samples and simulated model and email adapters |
-| Browser workspace | No login; local documents, browser model analysis, evidence review, PDF/ZIP packages and complete backup export/import |
+| Browser workspace | No login; local documents, device or visitor-funded hosted analysis, evidence review, PDF/ZIP packages and complete backup export/import |
 
-The published website source is in [sites/](sites/README.md). Open it and start: no account or invitation is required. Files, extracted text and decisions stay in IndexedDB in that browser profile. First-time model analysis downloads public model assets and requires WebGPU and enough graphics memory; manual review and packaging work without loading a model.
+The published website source is in [sites/](sites/README.md). Open it and start: no account or invitation is required. Files, extracted text and decisions stay in IndexedDB in that browser profile. Device analysis downloads public model assets on first use and requires WebGPU and enough graphics memory. Hosted analysis sends the complete document text, filenames and work context through this server to OpenAI in one paid request using your key, with GPT-5.4 selected by default. It accepts up to 32,000 extracted characters and proposes up to 20 requirements with one or two source quotes each. Quotes preserve source words while normalizing whitespace. Oversized work is not partially sent; use device analysis or manual review. Keys stay in tab memory and are excluded from saved workspace data and backups. Manual review and packaging work without loading or calling a model.
 
 **Back up your work in Settings.** Export includes original files and packages; restore replaces the local workspace and requires renewed package approval. Clearing browser data can erase saved work. There is no automatic sync, teammate access or email delivery. Backup ZIPs and local records are not encrypted by Dove. See the [browser workspace guide](docs/HOSTED-WORKSPACE.md).
 

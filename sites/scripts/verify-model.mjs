@@ -39,7 +39,7 @@ try{
   if(errors.length){result.error=errors.join(' ');throw Error(id+': '+result.error);}
   result.loaded=new Date().toISOString();console.log('LOADED',id);
   await page.getByRole('button',{name:'Analyze documents',exact:true}).click();
-  await page.waitForFunction(()=>document.body.textContent.includes('Analysis saved. Review every proposed requirement.')||document.querySelector('main [role="alert"]'),null,{timeout:340000});
+  await page.waitForFunction(()=>document.body.textContent.includes('Analysis saved. Review every proposed requirement and check for omissions.')||document.querySelector('main [role="alert"]'),null,{timeout:340000});
   const alerts=await page.getByRole('alert').allTextContents();
   assert.equal(alerts.length,0,alerts.join(' '));
   result.analysis=await page.getByRole('tabpanel',{name:'Review',exact:true}).innerText();

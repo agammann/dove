@@ -41,7 +41,7 @@ if(p[2]==="analyze"&&method==="POST"){
  const data=z.object({revision:z.number().int(),requirements:z.unknown()}).strict().parse(input);
  need(data.revision===w.revision,"This work changed during analysis. Refresh and analyze the current documents.",409);
  const proposed=validateAnalysis(w,{requirements:data.requirements});
- w.requirements=proposed;invalidate(w);event(w,user.email,"Saved "+proposed.length+" source-linked browser proposals. Human review is required.");await save(org.id,w,v);return response(w);
+ w.requirements=proposed;invalidate(w);event(w,user.email,"Saved "+proposed.length+" source-linked proposals. Human review is required.");await save(org.id,w,v);return response(w);
 }
 
 if(p[2]==="requirement"&&method==="PUT"){
