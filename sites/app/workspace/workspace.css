@@ -3,3 +3,4 @@
 .d-analysis-options{margin:1.2rem 0;padding:1rem;border:1px solid var(--line);border-radius:8px;background:#f7faf7}.d-analysis-options .d-form-grid{margin:1rem 0}.d-analysis-options fieldset{margin-bottom:1rem}.d-analysis-options .d-muted{margin-bottom:.5rem;overflow-wrap:anywhere}
 
 @media(max-width:360px){.d-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.d-card-title{flex-wrap:wrap}}
+.d-packet p{overflow-wrap:anywhere}
