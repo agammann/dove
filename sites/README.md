@@ -28,7 +28,7 @@ Browser cleanup, private browsing, storage eviction, a different profile, or a d
 
 ## Browser analysis
 
-Analysis uses WebLLM in a dedicated browser worker. The default model is Qwen 3 4B; smaller Qwen 3 1.7B and Llama 3.2 1B options need less graphics memory but may produce weaker proposals. First use downloads model files from public hosts. Prompts and document text are not sent to a paid AI service. Hosting and model-download hosts may process ordinary request metadata.
+Analysis uses WebLLM in a dedicated browser worker. The default model is Qwen 3 4B; Qwen 3 1.7B needs less graphics memory but may produce weaker proposals. First use downloads model files from public hosts. Prompts and document text are not sent to a paid AI service. Hosting and model-download hosts may process ordinary request metadata.
 
 Use HTTPS or localhost, WebGPU and compatible hardware with enough graphics memory. Speed, download size and quality depend on the model and device. Cached assets may be evicted. The hosted website still needs a connection to load; Dove is not a guaranteed offline-installable application. Manual review and packaging do not require loading a model. There is no paid model fallback.
 
@@ -62,6 +62,8 @@ node scripts/preview-built.mjs
 
 In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. Model inference is a separate hardware-dependent check.
 
+To test actual model downloads and generation, run `node scripts/verify-model.mjs` against that same compiled preview with installed Chrome and a real WebGPU adapter. It downloads both offered models, creates fictional work through the interface, uploads a TXT source, checks generated quotes and human review requirements, and verifies download and analysis cancellation. Allow several GB of model downloads and enough free graphics memory. This manual check is separate from CI's proposal fixtures.
+
 ## Hosting and legacy data
 
 `.openai/hosting.json` identifies the existing deployment. Preserve its project ID when updating this site. The host serves the application; users do not need a ChatGPT account. No runtime secret is required by the browser workspace.
@@ -73,3 +75,5 @@ The Python/PostgreSQL application in the parent repository is a separate legacy 
 ## Verification
 
 September 30, 2026: 23 local browser checks passed using fictional documents, including no-login entry, local persistence, exact source checking, stale-write protection, PDF extraction, ZIP download, backup restore and separate browser-profile isolation. No workspace API or authentication requests occurred in that test. TypeScript, lint and production build checks are recorded with the release; one existing screenshot optimization warning is non-blocking. Real model quality and hardware support are not established by fixture tests.
+
+October 2, 2026 UTC: both offered Qwen models downloaded and generated proposals using actual WebGPU in Chrome 154.0.8037.95. Source quotes matched the uploaded fictional document; download cancellation permitted retry, and analysis cancellation preserved the prior checklist. The [measured report](docs/model-verification-2026-10-02.json) records the resulting proposals. Each model omitted other possible requirements in this example, so check omissions manually. This confirms a controlled workflow on one device, not completeness, accuracy across documents or support on other hardware. The Llama 1B option was removed after it exceeded the output limit on this short input. Thirty Python fixture tests also passed locally; no live email or Python provider call was made.

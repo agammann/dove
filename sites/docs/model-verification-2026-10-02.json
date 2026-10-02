@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-02T03:20:06.596Z",
+  "browser": "154.0.8037.95",
+  "models": [
+    {
+      "id": "Qwen3-1.7B-q4f16_1-MLC",
+      "started": "2026-10-02T03:20:07.130Z",
+      "loaded": "2026-10-02T03:20:26.116Z",
+      "analysis": "Evidence first. Your decision.\nAdd requirement\n\nOnly a person can mark a requirement satisfied or waived. Uploads and edits invalidate earlier package approvals.\n\nInvoice Amount Verification\nreceived\nFictional agreement. Example Customer accepted the finished logo and style guide on September 30, 2026. The agreed final billing amount is USD 2400.00 including applicable taxes. Purchase order PO-1042 must accompany the invoice. The customer has supplied purchase order PO-1042.\nAgreement.txt, page 1\n\nAgreement states USD 2400.00 for the invoice.\n\nReview requirement",
+      "completed": "2026-10-02T03:20:54.613Z",
+      "cancelPreservesChecklist": true
+    },
+    {
+      "id": "Qwen3-4B-q4f16_1-MLC",
+      "started": "2026-10-02T03:20:54.825Z",
+      "loaded": "2026-10-02T03:21:34.147Z",
+      "analysis": "Evidence first. Your decision.\nAdd requirement\n\nOnly a person can mark a requirement satisfied or waived. Uploads and edits invalidate earlier package approvals.\n\nInvoice Must Include Purchase Order PO-1042\nreceived\nFictional agreement. Example Customer accepted the finished logo and style guide on September 30, 2026. The agreed final billing amount is USD 2400.00 including applicable taxes. Purchase order PO-1042 must accompany the invoice. The customer has supplied purchase order PO-1042.\nAgreement.txt, page 1\n\nSource states: 'Purchase order PO-1042 must accompany the invoice.'\n\nReview requirement",
+      "completed": "2026-10-02T03:22:06.803Z",
+      "cancelPreservesChecklist": true
+    }
+  ],
+  "errors": [],
+  "transmissions": [],
+  "checks": [
+    "Actual create and TXT upload forms persist the fictional source",
+    "Real download cancellation returns to a retryable idle state",
+    "Both offered model downloads and inference results use real WebGPU with no mock or paid fallback"
+  ]
+}

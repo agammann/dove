@@ -52,6 +52,8 @@ In a second terminal, activate the same environment, enter `backend/` and run `p
 
 Run `python -m pytest tests -q` from `backend/` for native tests. From `frontend/`, `pnpm check` checks TypeScript and `pnpm build` compiles the UI. Preserve both dependency lockfiles.
 
+GitHub Actions also builds and starts the documented Compose stack, tests SQLite and a disposable PostgreSQL database, seeds the sample, and checks a backup in a separate restored database. A second job builds the browser workspace and runs its storage, package and backup checks against the compiled Worker. Real WebGPU model downloads remain an explicit hardware check; see [browser development](../sites/README.md#local-development).
+
 `pnpm dev` is optional: it proxies `/api` to port 8000. The backend's `PUBLIC_URL` must match the exact Vite origin, including its actual port. Restart the backend after environment changes. The documented full workflow uses the compiled frontend served by FastAPI.
 
 ## Before publication

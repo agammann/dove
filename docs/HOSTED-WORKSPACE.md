@@ -41,3 +41,5 @@ The browser release retains the old D1/R2 resources and migrations. It does not 
 ## Verification
 
 September 30, 2026: 23 local browser checks passed, covering no-login entry, durable local storage, source/revision checks, invoice PDF extraction, package approval, ZIP download, complete backup restoration, invalid-backup rollback and isolation between browser profiles. The workflow made no workspace API or authentication requests. Real model generation is checked separately from these fictional proposal fixtures.
+
+October 2, 2026 UTC: the Qwen 3 1.7B and default Qwen 3 4B options completed real downloads and source-linked analysis in Chrome 154.0.8037.95 with WebGPU. Cancelled analysis preserved the existing checklist. Both models omitted other possible requirements in the controlled example; review missing items yourself. See the [model report](../sites/docs/model-verification-2026-10-02.json) and [repeatable hardware check](../sites/README.md#local-development).

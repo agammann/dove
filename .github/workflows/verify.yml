@@ -1,0 +1,75 @@
+name: Verify Dove
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python-sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start documented Docker sample
+        run: docker compose up --build --detach --wait --wait-timeout 180
+      - name: Verify SQLite and disposable PostgreSQL databases
+        run: |
+          docker compose run --rm --no-deps -T api python -m pytest tests -q
+          docker compose exec -T db createdb -U dove dove_test
+          docker compose run --rm --no-deps -T -e TEST_DATABASE_URL=postgresql+psycopg://dove:local-dove-password@db/dove_test api python -m pytest tests -q
+      - name: Verify seeded application and isolated recovery
+        run: |
+          docker compose exec -T api python -m dove.cli seed
+          curl --fail http://127.0.0.1:8000/api/health
+          curl --fail http://127.0.0.1:8000/ > /tmp/dove-index.html
+          test "$(docker compose exec -T api id -u)" = 10001
+          python scripts/backup.py --output /tmp/dove-backup
+          python scripts/verify_restore.py /tmp/dove-backup
+      - name: Show container logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop disposable stack
+        if: always()
+        run: docker compose down --volumes
+
+  browser-workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: sites
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: sites/package-lock.json
+      - run: npm ci
+      - run: npm audit --audit-level=low
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Verify compiled browser workspace
+        env:
+          DOVE_TEST_CHANNEL: chromium
+        run: |
+          node scripts/preview-built.mjs > /tmp/dove-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" || true' EXIT
+          for attempt in {1..60}; do
+            if curl --silent --fail http://127.0.0.1:5174/workspace > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:5174/workspace > /dev/null
+          node scripts/verify-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dove-browser-verification
+          path: sites/outputs/
