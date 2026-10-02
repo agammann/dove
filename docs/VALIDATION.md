@@ -47,9 +47,9 @@ Tests cover cross organization reads and mutations, approval invalidation, amoun
 
 ## Security review and remediation
 
-Codex Security completed scan `09ef0b51-214b-464f-905f-2ae9cbaa93c5` against the original unversioned snapshot. The scan warned that files changed during scanning and saved results for the original snapshot. It reported three medium findings: PDF processing availability, unbounded retained file versions and inconsistent outgoing message allowances.
+The historical review of the original snapshot identified three concerns: PDF processing availability, unbounded retained file versions and inconsistent outgoing message allowances. Files changed during that review, so its evidence applies to the original snapshot.
 
-The changed source moves PDF processing into bounded subprocesses outside organization transactions, enforces physical storage and retained version limits, and shares outgoing reservations across requests, packages and retries. Regression tests exercise these changes. The historical scan findings are not automatically closed by local changes. Current source and deployment review remains a release gate.
+The changed source moves PDF processing into bounded subprocesses outside organization transactions, enforces physical storage and retained version limits, and shares outgoing reservations across requests, packages and retries. Regression tests exercise these changes. Current source and deployment review remains a release gate.
 
 ## Known limits
 

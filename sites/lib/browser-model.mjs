@@ -3,7 +3,6 @@
 export const MODELS = [
   { id: 'Qwen3-1.7B-q4f16_1-MLC', label: 'Standard · Qwen 3 1.7B' },
   { id: 'Qwen3-4B-q4f16_1-MLC', label: 'Larger · Qwen 3 4B' },
-  { id: 'Llama-3.2-1B-Instruct-q4f16_1-MLC', label: 'Smaller · Llama 3.2 1B' },
 ];
 let selected = MODELS[1].id;
 let engine, worker, loading, loadController, active = false;
