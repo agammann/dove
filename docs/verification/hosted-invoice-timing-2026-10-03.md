@@ -51,15 +51,17 @@ The first production attempt passed 42 checks, then failed its 43rd check becaus
 
 All 20 observed asset responses, covering 10 distinct client paths, matched the submitted build manifest. This checks those served assets, not all build files or saved server-archive byte equality. The model-free production result does not change the incomplete semantic criterion above.
 
-## Dependency audit remains blocked
+## Dependency audit history
 
 The [October 3 PR CI run](https://github.com/agammann/dove/actions/runs/37093371712) passed the Python sample job but stopped the browser job at `npm audit --audit-level=low`, before its tests and build. The audit reported eight high-severity dependency entries for [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm): `braces` 3.0.3 and its transitive lint/build dependents, all marked development dependencies in the lockfile. The advisory listed no patched version when checked on October 3. This establishes an unresolved dependency finding, not a demonstrated exploit of the deployed app.
 
 The entries are `braces`, `micromatch`, `fast-glob`, `@next/eslint-plugin-next`, `eslint-config-next`, `vite-plugin-dynamic-import`, `vite-plugin-commonjs` and `vinext`.
 
-CI now retains the full audit JSON and runs the remaining checks before a final audit gate. The job still fails unless the audit succeeds; the severity threshold and dependencies are unchanged. No clean dependency audit or fully green CI is claimed for this revision.
+In those revisions, CI retained the full audit JSON and ran the remaining checks before a final audit gate. The job still failed unless the audit succeeded; its severity threshold and dependencies were unchanged. No clean dependency audit or fully green CI is claimed for those revisions.
 
 The [follow-up CI run](https://github.com/agammann/dove/actions/runs/37094572964), at `b4531891f096c5f23e1757c70719a17be0981e5e`, passed the Python sample, browser unit tests, TypeScript, lint, build and 23 compiled-browser workflow checks with no browser errors or API transmissions. The overall run still failed its final audit gate on the same eight findings.
+
+The later [build-migration record](browser-build-migration-2026-10-03.md) tracks removal of the affected build/lint dependency chains. It does not change any model result above.
 
 ## What an operator still needs to do
 

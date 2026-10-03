@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable @next/next/no-html-link-for-pages -- Workspace and landing page use full navigation. */
 import {useEffect,useState,useRef} from "react";
 import {ArrowLeft,ArrowRight,FileText,LoaderCircle,Plus} from "lucide-react";
 import type {Work,Requirement,Evidence,Workspace as Org} from "../../lib/dove-types";

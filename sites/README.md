@@ -54,14 +54,20 @@ Cancellation preserves the previous checklist, but usage already incurred can st
 
 Requires Node.js 22.13+ and npm. Development, builds, fixture tests and device/manual workflows require no API key, account, local database initialization or invitation. Real hosted inference requires a visitor-supplied key.
 
+The browser app uses React and Vite. Builds pre-render the landing page and the workspace's initial loading view, then hydrate their existing React components. A Cloudflare Worker serves those pages and delegates hosted analysis to the visitor-key handler. The storage and backup formats are unchanged.
+
 ```sh
+cd sites
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173/workspace`.
+Open `http://127.0.0.1:5173/workspace`.
+
+`npm run build` creates the browser assets in `dist/client` and the Worker in `dist/server/index.js`. `npm start` serves that compiled build on `http://127.0.0.1:5173`; the verification preview below uses port 5174. Browser storage belongs to the full origin, so different ports have separate workspaces.
 
 ```sh
+npm audit --audit-level=low
 npm test
 npx tsc --noEmit
 npm run lint
@@ -69,7 +75,7 @@ npm run build
 node scripts/preview-built.mjs
 ```
 
-In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. Model inference is a separate hardware-dependent check.
+In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. `npm test` also checks explicit page routing, slash redirects, retired API responses and visitor-key validation. Model inference is a separate hardware-dependent check.
 
 To test actual model downloads and generation, run `node scripts/verify-model.mjs` against that same compiled preview with installed Chrome and a real WebGPU adapter. It downloads both offered models, creates fictional work through the interface, uploads a TXT source, checks generated quotes and human review requirements, and verifies download and analysis cancellation. Allow several GB of model downloads and enough free graphics memory. This manual check is separate from CI's proposal fixtures.
 
@@ -82,6 +88,8 @@ Earlier authenticated D1/R2 workspace records and access requests are **not dele
 The Python/PostgreSQL application in the parent repository is a separate legacy implementation with its own authentication and optional providers. These browser changes do not convert that application.
 
 ## Verification
+
+The [October 3 invoice-timing follow-up](../docs/verification/hosted-invoice-timing-2026-10-03.md) retained four first GPT-5.4 responses: three cases fully met their frozen criteria, and one explanation omitted the implied November 1 due date. Its separate local and production manual-review checks do not establish model completeness. [Build-migration verification](../docs/verification/browser-build-migration-2026-10-03.md) records the later runtime change and a genuine native WebMCP check in Chrome 154.0.8037.98 with its testing flag, separately from published-site and model results.
 
 The October 2 hosted development check used real GPT-5.4 responses for five fictional PDF/TXT scenarios, including missing documents, conflicting records, unrelated-project acceptance and a longer source set. Expected category/status and quote checks passed after instruction refinement. Manual review still found an omitted invoice-date/due-date checklist item in the long example. GPT-5.4 mini was checked on the conflicting-record scenario only. These runs do not establish general accuracy or completeness; see [the recorded scope and limitations](../docs/HOSTED-WORKSPACE.md#verification).
 

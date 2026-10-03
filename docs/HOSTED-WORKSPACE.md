@@ -42,6 +42,8 @@ The browser release retains the old D1/R2 resources and migrations. It does not 
 
 ## Verification
 
+The [October 3 follow-up](verification/hosted-invoice-timing-2026-10-03.md) improved invoice-timing coverage while retaining one incomplete explanation: 15 of 16 frozen criteria across four first GPT-5.4 responses. This is a bounded development result, not an accuracy score. The later [browser build migration](verification/browser-build-migration-2026-10-03.md) preserves the model contract and has separate verification.
+
 October 2, 2026 UTC: five fictional PDF/TXT document scenarios completed through the compiled Worker and rendered browser interface using real GPT-5.4 responses. They covered matching records, missing PO/acceptance documents, conflicting amounts and acceptance, unrelated-project acceptance, and a 9,303-character source set. The final run matched 17 preset category/status targets; document/page/quote checks passed, and manual review of all 29 proposals confirmed the core conclusions. GPT-5.4 mini also completed the conflicting-record scenario with the expected amount and acceptance conflicts.
 
 An earlier run omitted a payment term and a delivery requirement and inferred an invoice-format rule from a known billing contact. The instructions were refined using those same scenarios, so this is a development check, not a held-out accuracy benchmark. The final long example still omitted the invoice date and due date from its checklist. Review every source and add missing requirements; matching quotes and expected categories do not establish completeness or truth. The 32,000-character limit is an input bound, not a measured quality guarantee.
