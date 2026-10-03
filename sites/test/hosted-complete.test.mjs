@@ -36,9 +36,9 @@ test('hosted analysis sends complete pages and work context in one request with 
     assert.equal(payload.batch.source[2].text, work.documents[1].pages[0]);
     assert.equal('earlierProposals' in payload.batch, false);
     assert.equal(options.body.includes(apiKey), false);
-    return Response.json({ value: { requirements: [proposal] }, model: 'gpt-5.4' });
+    return Response.json({ value: { sourceReview: [{ documentId: agreementId, pages: [1, 2] }, { documentId: invoiceId, pages: [1] }], requirements: [{ ...proposal, missingInformation: null }] }, model: 'gpt-5.4' });
   });
-  assert.deepEqual(await analyzeDocumentsHosted(work, { apiKey }), [proposal]);
+  assert.deepEqual(await analyzeDocumentsHosted(work, { apiKey }), [{ ...proposal, title: 'Review conflicting amounts' }]);
   assert.equal(request.mock.callCount(), 1);
   assert.equal(JSON.stringify(work), before);
 });

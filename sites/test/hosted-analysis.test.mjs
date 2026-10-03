@@ -12,7 +12,8 @@ const source = [{ documentId: id, name: 'Agreement.txt', page: 1, text: 'Purchas
 const batch = { source, work: { title: 'Logo handoff', customer: 'Example Customer', description: 'Completed logo and style guide.' } };
 const hostedWork = { ...batch.work, documents: [{ id, name: source[0].name, pages: [source[0].text] }] };
 const proposal = { title: 'Purchase order', category: 'purchase_order', status: 'received', reason: 'The customer supplied the required purchase order.', evidence: [{ documentId: id, page: 1, quote: source[0].text }] };
-const completion = requirements => Response.json({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ requirements }) }] }] });
+const sourceReview = [{ documentId: id, pages: [1] }];
+const completion = requirements => Response.json({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ sourceReview, requirements: requirements.map(item => ({ ...item, missingInformation: null })) }) }] }] });
 const request = (payload = { batch }, options = {}) => new Request('https://dove.example/api/analyze/visitor', {
   method: 'POST', headers: { Origin: 'https://dove.example', 'Content-Type': 'application/json', Authorization: `Bearer ${key}` }, body: JSON.stringify(payload), ...options,
 });
@@ -35,7 +36,7 @@ test('visitor analysis uses only the supplied key and a fixed nonpersistent prov
   } });
   assert.equal(response.status, 200); assert.equal(calls, 1);
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
-  assert.deepEqual((await response.json()).value.requirements, [proposal]);
+  assert.deepEqual((await response.json()).value, { sourceReview, requirements: [{ ...proposal, missingInformation: null }] });
 });
 
 test('missing keys, foreign origins and unsupported payloads never reach a provider', async () => {
@@ -108,7 +109,7 @@ test('hosted PDF quote enums normalize whitespace while retaining document and p
   const quote = 'The agreed amount is USD 2400.00. The work was accepted.';
   const schema = hostedAnalysisSchema(sections);
   assert.deepEqual(schema.properties.requirements.items.properties.evidence.items.properties.quote.enum, [quote]);
-  const value = { requirements: [{ ...proposal, evidence: [{ documentId: id, page: 1, quote }] }] };
+  const value = { sourceReview, requirements: [{ ...proposal, missingInformation: null, evidence: [{ documentId: id, page: 1, quote }] }] };
   assert.deepEqual(validateHostedResult(sections, value), value);
   assert.throws(() => validateHostedResult(sections, { requirements: [{ ...proposal, evidence: [{ documentId: id, page: 2, quote }] }] }));
 });
