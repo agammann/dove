@@ -41,7 +41,15 @@ Forty-four checks passed, including:
 - The reminder, edit form and readiness state rendered at 1440 and 390 pixels without horizontal overflow. Saved decisions and readiness survived reload.
 - No page errors, console warnings, external browser requests or HTTP writes occurred. No package or outreach draft was created; owned browser and server processes were closed afterward.
 
-TypeScript, targeted lint, the production build and diff whitespace checks passed. This follow-up did not repeat device inference, native WebMCP, package export or approval testing; their earlier dated evidence retains its original scope.
+Local TypeScript, targeted lint, the production build and diff whitespace checks passed. This follow-up did not repeat device inference, native WebMCP, package export or approval testing; their earlier dated evidence retains its original scope.
+
+## Dependency audit remains blocked
+
+The [October 3 PR CI run](https://github.com/agammann/dove/actions/runs/37093371712) passed the Python sample job but stopped the browser job at `npm audit --audit-level=low`, before its tests and build. The audit reported eight high-severity dependency entries for [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm): `braces` 3.0.3 and its transitive lint/build dependents, all marked development dependencies in the lockfile. The advisory listed no patched version when checked on October 3. This establishes an unresolved dependency finding, not a demonstrated exploit of the deployed app.
+
+The entries are `braces`, `micromatch`, `fast-glob`, `@next/eslint-plugin-next`, `eslint-config-next`, `vite-plugin-dynamic-import`, `vite-plugin-commonjs` and `vinext`.
+
+CI now retains the full audit JSON and runs the remaining checks before a final audit gate. The job still fails unless the audit succeeds; the severity threshold and dependencies are unchanged. No clean dependency audit or fully green CI is claimed for this revision.
 
 ## What an operator still needs to do
 

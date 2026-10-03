@@ -50,7 +50,12 @@ jobs:
           cache: npm
           cache-dependency-path: sites/package-lock.json
       - run: npm ci
-      - run: npm audit --audit-level=low
+      - name: Record dependency audit
+        id: dependency-audit
+        continue-on-error: true
+        run: |
+          mkdir -p outputs
+          npm audit --audit-level=low --json > outputs/dependency-audit.json
       - run: npm test
       - run: npx tsc --noEmit
       - run: npm run lint
@@ -74,3 +79,6 @@ jobs:
         with:
           name: dove-browser-verification
           path: sites/outputs/
+      - name: Require dependency audit success
+        if: always()
+        run: test '${{ steps.dependency-audit.outcome }}' = 'success'
