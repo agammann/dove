@@ -100,7 +100,17 @@ That UI run used the pre-title-correction revision. Workspace UI, storage, backu
 
 At 11:29 UTC, a separate model-free run imported the actual two-work backup from the successful model follow-up and passed 14 checks. All three references rendered; a manual reason-only edit kept the conflict unresolved and retained the exact citation document IDs, pages and quotations. Reload, one backup export and a fresh-context restore preserved the edited work/workspace records and all eight original source-file bytes. The complete citation card was inspected at 1440 and 390 pixels. No inference, key, approval, package or outreach action occurred. The storage concurrency counter changed normally on saving and fresh restoration; the backup format remained version 1.
 
-The final local title-correction source passed 25 unit tests, TypeScript, zero-warning lint and the compiled build. Publication and public-site verification of this review-contract revision are pending. The earlier four-case 15/16 result and five-case title failure remain unchanged.
+The final local title-correction source passed 25 unit tests, TypeScript, zero-warning lint and the compiled build. The published revision and its subsequent checks are recorded below. The earlier four-case 15/16 result and five-case title failure remain unchanged.
+
+## Published follow-up
+
+[PR 4](https://github.com/agammann/dove/pull/4) merged the reviewed changes. [Final CI run 37121576467](https://github.com/agammann/dove/actions/runs/37121576467) passed 25 unit tests, 23 compiled-browser checks, TypeScript, lint, build and the required dependency-audit gate. The separate Python sample passed 30 SQLite and 30 PostgreSQL tests; Docker health, the non-root command and backup/isolated restore checks passed. Existing non-failing dependency, chunk-size and Python deprecation warnings remain.
+
+At 12:48 UTC on October 3, [Dove v11](https://dove-paperwork.alx21.chatgpt.site/workspace/) was published from Site source `e9a41a252e57972ab1010c9d7b7b834534a4697a`. All 20 subsequent bounded public HTTP checks passed: canonical routes, redirects without following them, expected unknown/configuration 404s and the observed HTML/assets. The harmless 24-byte `.assetsignore` is publicly served; its earlier incorrect 404 expectation remains a recorded failed check.
+
+At 13:06 UTC, one first production `gpt-5.4` submission, without retries, passed 15 transport/source/UI checks. Independent review of all seven complete source sections found all six raw and saved proposals and 14 quotations supported. The three-citation conflict distinguishes the October 2 invoice date, the agreement's 30-day term, the implied November 1 date and the printed October 25 due date. It remains unresolved and requires a human decision. The key was cleared before screenshots and a genuine 19,003-byte backup export containing the saved work and four original files.
+
+This adds one fictional public-handler case, not general accuracy, completeness, absence-detection or full-limit coverage. The retained response is the actual validated handler body before client normalization; the internal raw provider envelope is unavailable. Earlier native WebMCP checks retain their recorded revision and browser scope; no new final-v11 native run is claimed. This fresh profile also does not establish existing visitors' public-origin storage continuity. All earlier failures remain unchanged.
 
 ## What an operator still needs to do
 
