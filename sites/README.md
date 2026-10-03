@@ -1,6 +1,6 @@
 # Dove — browser workspace
 
-[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace) · [Website](https://dove-paperwork.alx21.chatgpt.site) · [Source](https://github.com/agammann/dove)
+[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace/) · [Website](https://dove-paperwork.alx21.chatgpt.site) · [Source](https://github.com/agammann/dove)
 
 From completed work to completed paperwork. Dove opens directly in your browser: **no login, no ChatGPT account and no invitation**. Device analysis and manual review need no API key. Optional OpenAI analysis uses your own API key and is billed to your account.
 
@@ -40,7 +40,7 @@ Choose **OpenAI with your key** explicitly to use GPT-5.4 (the default) or GPT-5
 
 This mode sends the complete extracted document text and filenames, plus the work title, customer and description, through the Dove server to OpenAI. Work context identifies the job but does not count as source evidence. The API request uses `store: false`; OpenAI's applicable data policies still apply. Your key stays in tab memory and is sent in an authorization header. It is excluded from IndexedDB, workspace backups and saved proposals. Clear it with **Clear key**, switch back to device mode or reload the page. The application does not log the key.
 
-Cancellation preserves the previous checklist, but usage already incurred can still be billed. Invalid keys, provider errors and unverified source quotes cannot save replacement analysis. Hosted results can contain up to 20 requirements with one or two quotes each. Quotes preserve source words while normalizing line breaks and repeated spaces, and must match the cited document and page. The existing revision and human-approval checks still apply. A stronger model can still omit requirements or miss conflicts; review the documents yourself.
+Cancellation preserves the previous checklist, but usage already incurred can still be billed. Invalid keys, provider errors and unverified source quotes cannot save replacement analysis. Hosted results can contain up to 20 requirements with one to three quotes each. Quotes preserve source words while normalizing line breaks and repeated spaces, and must match the cited document and page. The returned source scope must name every submitted document/page; this checks declared coverage, not model understanding or absence. New hosted conflicts receive neutral category-specific review titles while their exact reasons, statuses and references are preserved. Existing saved/imported requirements and human-edited titles are not rewritten. Missing-information headings and explanations use fixed uncertainty wording, and any invoice role is model-identified. Context quotes do not establish that information is absent. The saved-work and backup formats are unchanged. The existing revision and human-approval checks still apply. A stronger model can still omit requirements or miss conflicts; review the documents yourself.
 
 ## Limits
 
@@ -54,14 +54,20 @@ Cancellation preserves the previous checklist, but usage already incurred can st
 
 Requires Node.js 22.13+ and npm. Development, builds, fixture tests and device/manual workflows require no API key, account, local database initialization or invitation. Real hosted inference requires a visitor-supplied key.
 
+The browser app uses React and Vite. Builds pre-render the landing page and the workspace's initial loading view, then hydrate their existing React components. A Cloudflare Worker serves those pages and delegates hosted analysis to the visitor-key handler. The storage and backup formats are unchanged.
+
 ```sh
+cd sites
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173/workspace`.
+Open `http://127.0.0.1:5173/workspace/`. The asset service redirects `/workspace` to this canonical URL and serves the prerendered page. Static HTML uses the hosting layer's cache policy; API responses retain their own method and cache rules.
+
+`npm run build` creates the browser assets in `dist/client` and the Worker in `dist/server/index.js`. `npm start` serves that compiled build on `http://127.0.0.1:5173`; the verification preview below uses port 5174. Browser storage belongs to the full origin, so different ports have separate workspaces.
 
 ```sh
+npm audit --audit-level=low
 npm test
 npx tsc --noEmit
 npm run lint
@@ -69,7 +75,7 @@ npm run build
 node scripts/preview-built.mjs
 ```
 
-In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. Model inference is a separate hardware-dependent check.
+In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. `npm test` also checks explicit page routing, slash redirects, retired API responses and visitor-key validation. Model inference is a separate hardware-dependent check.
 
 To test actual model downloads and generation, run `node scripts/verify-model.mjs` against that same compiled preview with installed Chrome and a real WebGPU adapter. It downloads both offered models, creates fictional work through the interface, uploads a TXT source, checks generated quotes and human review requirements, and verifies download and analysis cancellation. Allow several GB of model downloads and enough free graphics memory. This manual check is separate from CI's proposal fixtures.
 
@@ -82,6 +88,8 @@ Earlier authenticated D1/R2 workspace records and access requests are **not dele
 The Python/PostgreSQL application in the parent repository is a separate legacy implementation with its own authentication and optional providers. These browser changes do not convert that application.
 
 ## Verification
+
+The [October 3 invoice-timing record](../docs/verification/hosted-invoice-timing-2026-10-03.md) preserves the earlier 15-of-16 result and a later five-case check whose three-page conflict had a misleading affirmative title. After the title correction, two new first GPT-5.4 responses met their frozen criteria, including the explicit November 1 calculation and all three source references. Separate model-free Package/backup checks passed; none of these bounded checks establishes general accuracy or completeness. [Build-migration verification](../docs/verification/browser-build-migration-2026-10-03.md) records the later runtime change and a genuine native WebMCP check in Chrome 154.0.8037.98 with its testing flag, separately from published-site and model results.
 
 The October 2 hosted development check used real GPT-5.4 responses for five fictional PDF/TXT scenarios, including missing documents, conflicting records, unrelated-project acceptance and a longer source set. Expected category/status and quote checks passed after instruction refinement. Manual review still found an omitted invoice-date/due-date checklist item in the long example. GPT-5.4 mini was checked on the conflicting-record scenario only. These runs do not establish general accuracy or completeness; see [the recorded scope and limitations](../docs/HOSTED-WORKSPACE.md#verification).
 

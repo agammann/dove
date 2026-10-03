@@ -1,4 +1,4 @@
-import { HostedAnalysisInput, validateHostedResult } from './analysis-contract.mjs';
+import { HostedAnalysisInput, hostedRequirements } from './analysis-contract.mjs';
 
 export const HOSTED_CHARACTER_LIMIT = 32000;
 
@@ -41,6 +41,6 @@ export async function analyzeDocumentsHosted(work, { apiKey, model = 'gpt-5.4', 
   const key = visitorKey(apiKey);
   onProgress(`Reading all ${work.documents.length} document${work.documents.length === 1 ? '' : 's'} together using OpenAI…`);
   const result = await requestAnalysis(batch, key, model, signal);
-  try { return validateHostedResult(batch.source, result.value).requirements; }
+  try { return hostedRequirements(batch.source, result.value); }
   catch { throw Error('The analysis did not pass source and status checks. Your checklist is unchanged.'); }
 }
