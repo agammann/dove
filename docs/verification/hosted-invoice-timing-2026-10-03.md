@@ -11,7 +11,7 @@ Four fictional cases ran through the rendered browser workspace and compiled loc
 - Real-response source tree: `a7056fe2fb534914cdd20cd9f4f3731ad6dead51`, based on `3827d0a7246b585f3cc9bef2ba5ad3ea57ca87ed`.
 - Manual UI tree `8c461bb2e9e357611d34ee9fdba43324c7a4236e` added only an accessible label to the decision selector. The [analysis contract](../../sites/lib/analysis-contract.mjs) stayed byte-identical: SHA-256 `9ef477bafa322beaf518395c4e1bd02389de4fdc4310bcc21549f117345dc7df`. Model responses remain attributed to the earlier tree; the UI check added no inference.
 
-These were checks of local compiled builds, not a production deployment check.
+The model responses and 44-check manual run below used local compiled builds; the later production smoke is recorded separately.
 
 ## First-response findings
 
@@ -41,7 +41,15 @@ Forty-four checks passed, including:
 - The reminder, edit form and readiness state rendered at 1440 and 390 pixels without horizontal overflow. Saved decisions and readiness survived reload.
 - No page errors, console warnings, external browser requests or HTTP writes occurred. No package or outreach draft was created; owned browser and server processes were closed afterward.
 
-Local TypeScript, targeted lint, the production build and diff whitespace checks passed. This follow-up did not repeat device inference, native WebMCP, package export or approval testing; their earlier dated evidence retains its original scope.
+Local TypeScript, targeted lint, the production build and diff whitespace checks passed. The 44-check manual run did not repeat device inference, native WebMCP, package export or approval testing; their earlier dated evidence retains its original scope.
+
+## Production manual workflow
+
+On October 3 at 04:09 UTC, [the public workspace](https://dove-paperwork.alx21.chatgpt.site/workspace), version 8 with source `849ba4dee214f10982926bebfe4a08451d2c6ff4`, passed 47 checks in a fresh sandboxed Chrome 154.0.8037.98 context. The actual interface imported fictional TXT, added two source-linked requirements, saved keyboard/manual decisions, enforced unreviewed and partial-review blockers, and preserved readiness after reload. The reminder, decision form and readiness state rendered at 1440 and 390 pixels without horizontal overflow. No key, hosted mode, inference, package or outreach action was used.
+
+The first production attempt passed 42 checks, then failed its 43rd check because an all-writes guard blocked two Cloudflare JavaScript Detection POSTs; both blocked-request console errors remain recorded. A separately reviewed follow-up allowed only the observed same-origin `/cdn-cgi/challenge-platform/h/b/jsd/oneshot/` POST prefix, capped at one per initial load/reload and two overall. It observed one initial request completing with HTTP 200 and none on reload. This is request-completion evidence, not a human/bot-clearance claim. No application API calls, other writes, external requests, WebSockets, page errors or console warnings occurred; the owned browser closed afterward.
+
+All 20 observed asset responses, covering 10 distinct client paths, matched the submitted build manifest. This checks those served assets, not all build files or saved server-archive byte equality. The model-free production result does not change the incomplete semantic criterion above.
 
 ## Dependency audit remains blocked
 
@@ -50,6 +58,8 @@ The [October 3 PR CI run](https://github.com/agammann/dove/actions/runs/37093371
 The entries are `braces`, `micromatch`, `fast-glob`, `@next/eslint-plugin-next`, `eslint-config-next`, `vite-plugin-dynamic-import`, `vite-plugin-commonjs` and `vinext`.
 
 CI now retains the full audit JSON and runs the remaining checks before a final audit gate. The job still fails unless the audit succeeds; the severity threshold and dependencies are unchanged. No clean dependency audit or fully green CI is claimed for this revision.
+
+The [follow-up CI run](https://github.com/agammann/dove/actions/runs/37094572964), at `b4531891f096c5f23e1757c70719a17be0981e5e`, passed the Python sample, browser unit tests, TypeScript, lint, build and 23 compiled-browser workflow checks with no browser errors or API transmissions. The overall run still failed its final audit gate on the same eight findings.
 
 ## What an operator still needs to do
 
