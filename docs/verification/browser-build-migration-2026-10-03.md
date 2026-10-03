@@ -2,9 +2,9 @@
 
 [Browser setup](../../sites/README.md#local-development) · [Invoice-timing results](hosted-invoice-timing-2026-10-03.md)
 
-The browser application uses React and Vite with a Cloudflare Worker. The landing page and initial workspace view are pre-rendered, then hydrated. Explicit Worker routes preserve `/` and `/workspace`, slash redirects, retired workspace/access APIs, the visitor-key handler and asset 404 responses. Managed hosting behavior remains a separate deployment check.
+Dove's required browser dependency audit failed because the Next lint configuration and Vinext build chain brought in an unpatched `braces` advisory. The browser application now uses React and Vite with a Cloudflare Worker, removing both affected chains without lowering the audit threshold. The landing page and initial workspace view are pre-rendered, then hydrated. The asset service serves `/` and `/workspace/` and redirects `/workspace` to its canonical folder URL. The Worker retains API slash normalization, retired workspace/access APIs and the visitor-key handler; unknown assets remain 404 responses.
 
-The migration removes the Next lint configuration and Vinext build chains that pulled in `braces`. Direct ESLint configuration retains the React, hooks/compiler, TypeScript, accessibility and import rules. The audit threshold remains `low`, with no advisory waiver. The locked dependency audit reported zero findings on October 3 at 06:32 UTC. Earlier failed audit runs remain recorded in [the invoice-timing history](hosted-invoice-timing-2026-10-03.md#dependency-audit-history).
+Direct ESLint configuration retains the React, hooks/compiler, TypeScript, accessibility and import rules. The audit threshold remains `low`, with no advisory waiver. The local locked dependency audit reported zero findings on October 3 at 06:32 UTC, followed by the passing CI result below. Earlier failed audit runs remain recorded in [the invoice-timing history](hosted-invoice-timing-2026-10-03.md#dependency-audit-history).
 
 ## Recorded checks and limits
 
@@ -16,13 +16,23 @@ On October 3 at 07:26 UTC, the final compiled local preview passed **137 checks*
 
 The injected browser-agent lifecycle checks in that run are fixtures; genuine native evidence is recorded separately below. Managed production migration checks remain separate from this local result.
 
+## CI and published version
+
+[GitHub CI run 37107146490](https://github.com/agammann/dove/actions/runs/37107146490), for `99b258e4af5a6b10358d278c42b6246c3b0f8a24`, passed both jobs on October 3 at 07:42 UTC. The browser job reported zero dependency findings, passed 19 unit tests, TypeScript, lint and the build, then passed all 23 compiled browser workflow checks with no browser errors or API transmissions. The separate Python sample passed 30 tests against SQLite and 30 against PostgreSQL, with one warning in each run. Its health and isolated restore checks passed, three stored objects were verified, and the disposable stack was removed.
+
+Version **9** was saved and its deployment succeeded at **07:51 UTC**, from Site source `27c61810714fd0d6af39a0c5179a15b857944be1`, at [the existing public URL](https://dove-paperwork.alx21.chatgpt.site). Its first public walkthrough completed nine genuine native calls and the landing layouts, then failed an exact-URL wait that expected `/workspace` rather than `/workspace/`. No application errors or console warnings were recorded before that failure. The explicit HTTP acceptance matrix had not run, so this is a partial result.
+
+A separate ten-request GET/HEAD inspection confirmed `/workspace` redirects with 307 to `/workspace/`, which serves the expected prerendered workspace and bundle reference. Both canonical pages differed from the submitted HTML by one 938-byte script immediately before `</body>`; a later two-request inspection confirmed all other application HTML bytes were unchanged. The retained, parameter-redacted addition points to Cloudflare's JavaScript Detection endpoint, consistent with its [documented HTML injection](https://developers.cloudflare.com/cloudflare-challenges/challenge-types/javascript-detections/). This does not establish bot clearance or raw public HTML byte equality.
+
+Local configuration now uses asset-first lookup and [automatic folder trailing slashes](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/), matching the observed host behavior. After this alignment, 19 unit tests, TypeScript, lint, the build, all 23 existing compiled browser checks and 15 direct compiled route checks passed. Those route checks covered canonical GET/HEAD responses and redirects, unknown 404s, unsupported methods, retired APIs and a missing-key 401 without a provider request. The earlier 137-check run retains its original build and routing scope. Full public acceptance and CI for this subsequent source revision are still pending. Existing visitors' pre/post-deployment storage continuity has not been measured on the public origin.
+
 ## Local saved-state upgrade
 
 At 07:33 UTC, one fictional approved workspace passed a same-origin transition from the pre-migration compiled build based on `80ed120` to the final migration candidate in Edge 154.0.4258.48. A local proxy switched the served build while retaining the same browser profile and origin; no backup export/import was used. Settings, work creation and TXT upload used the old interface. A source-linked manual requirement and generated package were prepared through the old local libraries, then approval and downloads used the actual interface. No model or provider was involved.
 
 All three verification groups passed. The complete saved state and three stored files were unchanged, including the exact package approval. The new interface retained the settings and downloaded the original TXT, invoice PDF and package ZIP with matching stored hashes; the invoice downloaded before and after the transition was byte-identical. No API/authentication/model requests, browser errors or network violations occurred, and owned processes and ports closed afterward. Earlier path-preflight and Currency-selector attempts remain recorded as failed; they passed no acceptance groups.
 
-This checks one local fixture across the two compiled builds, not continuity for an existing visitor on the public origin. Public deployment continuity and new exact-head CI remain unverified at this point.
+This checks one local fixture across the two compiled builds, not continuity for an existing visitor on the public origin. Existing visitors' public-origin storage continuity remains unverified; the passing CI result above does not measure it.
 
 ## Genuine native WebMCP
 

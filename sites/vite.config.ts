@@ -50,7 +50,7 @@ export default defineConfig(async () => {
           main: "./worker/index.ts",
           compatibility_date: "2026-10-01",
           compatibility_flags: ["nodejs_compat"],
-          assets: { binding: "ASSETS", run_worker_first: true, html_handling: "none", not_found_handling: "none" },
+          assets: { binding: "ASSETS", run_worker_first: false, html_handling: "auto-trailing-slash", not_found_handling: "none" },
           d1_databases: d1 ? [{ binding: d1, database_name: "site-creator-d1", database_id: "00000000-0000-4000-8000-000000000000" }] : [],
           r2_buckets: r2 ? [{ binding: r2, bucket_name: "site-creator-r2" }] : [],
         },

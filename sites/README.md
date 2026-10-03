@@ -1,6 +1,6 @@
 # Dove — browser workspace
 
-[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace) · [Website](https://dove-paperwork.alx21.chatgpt.site) · [Source](https://github.com/agammann/dove)
+[Open Dove](https://dove-paperwork.alx21.chatgpt.site/workspace/) · [Website](https://dove-paperwork.alx21.chatgpt.site) · [Source](https://github.com/agammann/dove)
 
 From completed work to completed paperwork. Dove opens directly in your browser: **no login, no ChatGPT account and no invitation**. Device analysis and manual review need no API key. Optional OpenAI analysis uses your own API key and is billed to your account.
 
@@ -62,7 +62,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/workspace`.
+Open `http://127.0.0.1:5173/workspace/`. The asset service redirects `/workspace` to this canonical URL and serves the prerendered page. Static HTML uses the hosting layer's cache policy; API responses retain their own method and cache rules.
 
 `npm run build` creates the browser assets in `dist/client` and the Worker in `dist/server/index.js`. `npm start` serves that compiled build on `http://127.0.0.1:5173`; the verification preview below uses port 5174. Browser storage belongs to the full origin, so different ports have separate workspaces.
 

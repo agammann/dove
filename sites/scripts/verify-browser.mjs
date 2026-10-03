@@ -16,7 +16,7 @@ page.on("request",r=>{if(r.method()!=="GET"||/auth\.openai|api\.openai|\/api\/do
 function pass(name){checks.push(name);console.log("PASS",name)}
 try{
  await page.goto(base+"/workspace");await page.getByRole("heading",{name:"Good work. Ready to wrap up."}).waitFor();
- assert.equal(new URL(page.url()).pathname,"/workspace");assert.equal(await page.getByText("Sign out",{exact:true}).count(),0);pass("workspace opens without an account or authentication redirect");
+ assert.equal(new URL(page.url()).pathname,"/workspace/");assert.equal(await page.getByText("Sign out",{exact:true}).count(),0);pass("workspace opens without an account or authentication redirect");
  await page.addScriptTag({content:bundled.outputFiles[0].text});
  const core=await page.evaluate(async()=>{
   const {localApi:api,readState,commit,readFile,extract}=window.doveTest,results=[];

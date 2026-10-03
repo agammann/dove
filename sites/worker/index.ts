@@ -30,11 +30,11 @@ const worker = {
     const url = new URL(request.url);
     try { decodeURIComponent(url.pathname); }
     catch { return new Response(null, { status: 400 }); }
-    // Normalize repeated/trailing slashes without producing a protocol-relative
-    // Location header. Keep the query and HTTP method through a 308 redirect.
+    // Assets own page canonicalization. Normalize only API paths here, keeping
+    // the query and method without producing a protocol-relative Location.
     const normalized = url.pathname.replace(/\/{2,}/g, "/");
     const canonical = normalized === "/" ? "/" : normalized.replace(/\/+$/, "");
-    if (canonical !== url.pathname) {
+    if ((canonical === "/api" || canonical.startsWith("/api/")) && canonical !== url.pathname) {
       url.pathname = canonical;
       return new Response(null, { status: 308, headers: { Location: url.pathname + url.search } });
     }
@@ -44,14 +44,9 @@ const worker = {
     if (url.pathname === "/api" || url.pathname.startsWith("/api/")) return new Response(null, { status: 404 });
     if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405 });
 
-    const page = url.pathname === "/" || url.pathname === "/workspace";
-    if (url.pathname === "/") url.pathname = "/index.html";
-    else if (url.pathname === "/workspace") url.pathname = "/workspace/index.html";
-    const response = await env.ASSETS.fetch(new Request(url, request));
-    if (!page) return response;
-    const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "no-cache");
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    // Return the asset service response unchanged: it owns HTML redirects,
+    // cache policy and asset 404s in both the preview and managed hosting.
+    return env.ASSETS.fetch(request);
   },
 };
 

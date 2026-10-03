@@ -13,44 +13,44 @@ const bundled = await build({
 const { default: worker } = await import("data:text/javascript;base64," + Buffer.from(bundled.outputFiles[0].text).toString("base64"));
 const origin = "https://dove.example";
 
-function assets() {
+function assets(response = new Response("asset")) {
   const requests = [];
   return {
     requests,
-    env: {
-      ASSETS: {
-        async fetch(request) {
-          requests.push({ pathname: new URL(request.url).pathname, method: request.method });
-          const known = ["/index.html", "/workspace/index.html", "/favicon.svg"].includes(new URL(request.url).pathname);
-          return new Response(request.method === "HEAD" ? null : known ? "asset" : "missing", { status: known ? 200 : 404 });
-        },
-      },
-    },
+    env: { ASSETS: { async fetch(request) { requests.push(request); return response; } } },
   };
 }
 
-test("Worker maps both pages explicitly and retains asset 404s", async () => {
-  const { env, requests } = assets();
-  for (const [page, pathname] of [["/", "/index.html"], ["/workspace", "/workspace/index.html"]]) {
+test("Worker preserves the asset service's URL, status, headers and body", async () => {
+  for (const [path, status, headers, body] of [
+    ["/workspace", 307, { Location: "/workspace/" }, null],
+    ["/workspace/", 200, { "Cache-Control": "public, max-age=0, must-revalidate" }, "page"],
+    ["/missing", 404, { "X-Asset-Response": "missing" }, "missing"],
+  ]) {
     for (const method of ["GET", "HEAD"]) {
-      const response = await worker.fetch(new Request(origin + page, { method }), env);
-      assert.equal(response.status, 200);
-      assert.equal(response.headers.get("Cache-Control"), "no-cache");
-      assert.equal(await response.text(), method === "HEAD" ? "" : "asset");
-      assert.deepEqual(requests.at(-1), { pathname, method });
+      const supplied = new Response(method === "HEAD" ? null : body, { status, headers });
+      const { env, requests } = assets(supplied);
+      const request = new Request(origin + path + "?probe=1", { method });
+      const response = await worker.fetch(request, env);
+      assert.equal(response, supplied);
+      assert.deepEqual(requests, [request]);
     }
   }
-  assert.equal((await worker.fetch(new Request(origin + "/missing"), env)).status, 404);
-  assert.equal((await worker.fetch(new Request(origin + "/workspace", { method: "POST" }), env)).status, 405);
+  const { env, requests } = assets();
+  assert.equal((await worker.fetch(new Request(origin + "/workspace/", { method: "POST" }), env)).status, 405);
+  assert.equal(requests.length, 0);
 });
 
-test("Worker normalizes slashes without a protocol-relative redirect", async () => {
+test("Worker normalizes API slashes without rewriting asset paths", async () => {
   const { env, requests } = assets();
-  const response = await worker.fetch(new Request(origin + "//workspace///?probe=1", { method: "POST" }), env);
+  const response = await worker.fetch(new Request(origin + "//api//access///?probe=1", { method: "POST" }), env);
   assert.equal(response.status, 308);
-  assert.equal(response.headers.get("Location"), "/workspace?probe=1");
+  assert.equal(response.headers.get("Location"), "/api/access?probe=1");
   assert.equal(requests.length, 0);
   assert.equal((await worker.fetch(new Request(origin + "/%invalid"), env)).status, 400);
+  const request = new Request(origin + "//workspace///?probe=1");
+  await worker.fetch(request, env);
+  assert.equal(requests[0], request);
 });
 
 test("Worker keeps retired APIs and visitor validation ahead of asset serving", async () => {

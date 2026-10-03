@@ -61,7 +61,7 @@ In those revisions, CI retained the full audit JSON and ran the remaining checks
 
 The [follow-up CI run](https://github.com/agammann/dove/actions/runs/37094572964), at `b4531891f096c5f23e1757c70719a17be0981e5e`, passed the Python sample, browser unit tests, TypeScript, lint, build and 23 compiled-browser workflow checks with no browser errors or API transmissions. The overall run still failed its final audit gate on the same eight findings.
 
-The later [build-migration record](browser-build-migration-2026-10-03.md) tracks removal of the affected build/lint dependency chains. It does not change any model result above.
+The later [build-migration record](browser-build-migration-2026-10-03.md) tracks removal of the affected build/lint dependency chains. [CI run 37107146490](https://github.com/agammann/dove/actions/runs/37107146490), at `99b258e4af5a6b10358d278c42b6246c3b0f8a24`, passed both jobs with zero audit findings. That later result does not change any model result above or relabel the earlier failed runs.
 
 ## What an operator still needs to do
 
