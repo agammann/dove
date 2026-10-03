@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Start documented Docker sample
         run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Verify SQLite and disposable PostgreSQL databases
@@ -43,8 +43,8 @@ jobs:
       run:
         working-directory: sites
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: npm
@@ -74,7 +74,7 @@ jobs:
           done
           curl --silent --fail http://127.0.0.1:5174/workspace > /dev/null
           node scripts/verify-browser.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: dove-browser-verification
