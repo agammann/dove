@@ -14,3 +14,5 @@ coverage*
 .pnpm/
 *.tsbuildinfo
 docs/PROJECT-BRIEF.txt
+release-artifacts/
+verification-artifacts/

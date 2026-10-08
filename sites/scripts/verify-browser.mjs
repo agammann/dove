@@ -8,7 +8,7 @@ const base=process.env.DOVE_TEST_URL||"http://127.0.0.1:5174";
 assert(["http://127.0.0.1:5174","http://localhost:5173"].includes(base),"Use a local Dove preview.");
 await mkdir("outputs",{recursive:true});
 const bundled=await build({stdin:{contents:'export * from "./lib/dove-local"; export * from "./lib/dove-storage"; export * from "./lib/dove-backup"; export * from "./lib/dove-files";',resolveDir:process.cwd(),loader:"ts"},bundle:true,format:"iife",globalName:"doveTest",platform:"browser",write:false,target:"es2022"});
-const browser=await chromium.launch({channel:process.env.DOVE_TEST_CHANNEL||"msedge",headless:true});
+const browser=await chromium.launch({...(process.env.DOVE_TEST_EXECUTABLE?{executablePath:process.env.DOVE_TEST_EXECUTABLE}:{channel:process.env.DOVE_TEST_CHANNEL||"msedge"}),headless:true});
 const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
 const page=await context.newPage(),errors=[],transmissions=[],checks=[];
 page.on("pageerror",error=>errors.push(error.message));

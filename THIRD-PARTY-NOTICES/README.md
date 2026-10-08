@@ -1,6 +1,6 @@
 # Dependency notices
 
-Copies of license and notice files supplied by installed locked Python and npm dependencies. The index includes runtime and development packages. Docker base images retain their distribution notices within the images. These licenses do not assign a license to Dove's original source. Regenerate using the locked environments and scripts/collect_notices.py.
+Copies of license and notice files supplied by installed locked Python and npm dependencies. The index includes runtime and development packages. Docker base images retain their distribution notices within the images. Dove's original source uses the separate root MIT license; dependency terms remain applicable. Regenerate using the locked environments and scripts/collect_notices.py. Browser dependency notices are in [sites/THIRD-PARTY-NOTICES.txt](../sites/THIRD-PARTY-NOTICES.txt).
 
 ## Link compatibility
 

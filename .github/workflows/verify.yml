@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Start documented Docker sample
         run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Verify SQLite and disposable PostgreSQL databases
@@ -43,8 +43,8 @@ jobs:
       run:
         working-directory: sites
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: '22'
           cache: npm
@@ -74,7 +74,7 @@ jobs:
           done
           curl --silent --fail http://127.0.0.1:5174/workspace > /dev/null
           node scripts/verify-browser.mjs
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: dove-browser-verification
@@ -82,3 +82,99 @@ jobs:
       - name: Require dependency audit success
         if: always()
         run: test '${{ steps.dependency-audit.outcome }}' = 'success'
+
+  source-release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '24.19.0'
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+      - name: Package and verify exact source ZIP
+        run: |
+          node scripts/package-release.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/unpack-release.py --out ../dove-source-consumer
+          exit $LASTEXITCODE
+      - name: Install fresh source consumer
+        working-directory: ../dove-source-consumer/sites
+        run: npm ci
+      - name: Check fresh source consumer
+        working-directory: ../dove-source-consumer/sites
+        run: |
+          npm test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx tsc --noEmit
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run lint
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          exit $LASTEXITCODE
+      - name: Install measured native-test Chrome
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'dove-chrome.zip'
+          $directory = Join-Path $env:RUNNER_TEMP 'dove-chrome'
+          Invoke-WebRequest -Uri 'https://storage.googleapis.com/chrome-for-testing-public/155.0.8059.12/win64/chrome-win64.zip' -OutFile $archive
+          Expand-Archive -LiteralPath $archive -DestinationPath $directory
+          "DOVE_TEST_EXECUTABLE=$directory\chrome-win64\chrome.exe" >> $env:GITHUB_ENV
+      - name: Verify ordinary and genuine native browser behavior
+        working-directory: ../dove-source-consumer/sites
+        run: |
+          $preview = Start-Process -FilePath (Get-Command node).Source -ArgumentList 'scripts/preview-built.mjs' -WindowStyle Hidden -PassThru -RedirectStandardOutput "$env:RUNNER_TEMP/dove-preview.log" -RedirectStandardError "$env:RUNNER_TEMP/dove-preview-error.log"
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 60; $attempt++) {
+              try { Invoke-WebRequest 'http://127.0.0.1:5174/workspace/' -UseBasicParsing | Out-Null; $ready = $true; break } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $ready) { throw 'Compiled consumer preview did not start.' }
+            npm run test:browser
+            if ($LASTEXITCODE -ne 0) { throw 'Ordinary browser verification failed.' }
+            npm run test:native
+            if ($LASTEXITCODE -ne 0) { throw 'Native browser verification failed.' }
+          } finally {
+            & taskkill /PID $preview.Id /T /F | Out-Null
+          }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: dove-release
+          path: release-artifacts/
+          if-no-files-found: error
+      - name: Collect consumer verification inside the checkout
+        if: always()
+        run: |
+          $outputs = Join-Path (Split-Path $env:GITHUB_WORKSPACE -Parent) 'dove-source-consumer/sites/outputs'
+          if (Test-Path -LiteralPath $outputs) {
+            New-Item -ItemType Directory -Path verification-artifacts -Force | Out-Null
+            Copy-Item -LiteralPath $outputs -Destination verification-artifacts -Recurse
+          }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: dove-source-consumer-verification
+          path: verification-artifacts/
+
+  publish:
+    needs: [python-sample, browser-workspace, source-release]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: dove-release
+          path: release-artifacts/
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const {default: publish} = await import(process.env.GITHUB_WORKSPACE + '/scripts/release.mjs');
+            await publish({github, context, core});

@@ -4,6 +4,8 @@
 
 | Guide | Purpose |
 | :--- | :--- |
+| [Browser quickstart](BROWSER-QUICKSTART.md) | Fictional job, manual review, invoice and complete recovery |
+| [v1 scope and recovery](STABILITY.md) | Supported behavior, upgrades, backup and model limits |
 | [Browser workspace](HOSTED-WORKSPACE.md) | No-login website, local documents, backups and limits |
 | [First run](QUICKSTART.md) | Setup, fictional sample walkthrough and troubleshooting |
 | [Development](DEVELOPMENT.md) | Rebuilds, isolated tests and native development |

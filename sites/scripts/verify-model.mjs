@@ -2,7 +2,7 @@ import {chromium} from 'playwright';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 await mkdir('outputs',{recursive:true});
-const browser=await chromium.launch({channel:process.env.DOVE_TEST_CHANNEL||'chrome'});
+const browser=await chromium.launch({...(process.env.DOVE_TEST_EXECUTABLE?{executablePath:process.env.DOVE_TEST_EXECUTABLE}:{channel:process.env.DOVE_TEST_CHANNEL||'chrome'}),headless:process.env.DOVE_TEST_HEADLESS==='1'});
 const page=await browser.newPage({viewport:{width:1440,height:1000}});
 const report={date:new Date().toISOString(),browser:browser.version(),models:[],errors:[],transmissions:[],checks:[]};
 const source='Fictional agreement. Example Customer accepted the finished logo and style guide on September 30, 2026. The agreed final billing amount is USD 2400.00 including applicable taxes. Purchase order PO-1042 must accompany the invoice. The customer has supplied purchase order PO-1042.';
@@ -11,7 +11,7 @@ page.context().on('request',r=>{if(r.method()!=='GET')report.transmissions.push(
 let timer,lastStatus='';
 try{
  await page.goto('http://127.0.0.1:5174/workspace');
- report.gpu=await page.evaluate(async()=>{const adapter=await navigator.gpu?.requestAdapter();return {available:!!adapter,features:adapter?[...adapter.features]:[]};});
+ report.gpu=await page.evaluate(async()=>{const adapter=await navigator.gpu?.requestAdapter();return {available:!!adapter,features:adapter?[...adapter.features]:[],info:adapter?{vendor:adapter.info?.vendor,architecture:adapter.info?.architecture,device:adapter.info?.device,description:adapter.info?.description}:null};});
  assert(report.gpu.available,'A real WebGPU adapter is required; this test has no mock fallback');
  await page.getByRole('button',{name:'New work item',exact:true}).click();
  for(const [label,value] of [['Work title','Fictional model verification'],['Customer business','Example Customer'],['Billing contact name','Example Contact'],['Billing contact email','contact@example.invalid'],['What was completed?','Completed a fictional logo and style guide.']])await page.getByLabel(label,{exact:true}).fill(value);

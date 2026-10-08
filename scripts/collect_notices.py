@@ -38,5 +38,5 @@ for source in (root / "frontend" / "node_modules" / ".pnpm").rglob("package.json
             copied.append(target.name)
     index.append({"ecosystem": "npm", "name": data["name"], "version": data["version"], "license": data.get("license"), "notices": copied})
 (out / "index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
-(out / "README.md").write_text("# Dependency notices\n\nCopies of license and notice files supplied by installed locked Python and npm dependencies. The index includes runtime and development packages. Docker base images retain their distribution notices within the images. These licenses do not assign a license to Dove's original source. Regenerate using the locked environments and scripts/collect_notices.py.\n", encoding="utf-8")
+(out / "README.md").write_text("# Dependency notices\n\nCopies of license and notice files supplied by installed locked Python and npm dependencies. The index includes runtime and development packages. Docker base images retain their distribution notices within the images. Dove's original source uses the separate root MIT license; dependency terms still apply. Regenerate using the locked environments and scripts/collect_notices.py.\n", encoding="utf-8")
 print(f"Collected notices for {len(index)} installed package entries")

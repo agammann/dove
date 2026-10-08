@@ -1,5 +1,7 @@
 # Dove progress
 
+October 7, 2026: v1 is the browser workspace with manual source review, optional device/visitor-key analysis, exact package approval and complete backup recovery. See [v1 scope](docs/STABILITY.md), [quickstart](docs/BROWSER-QUICKSTART.md) and [dated verification](docs/verification/v1-2026-10-07.md). Original source now uses the [MIT license](LICENSE). The separately runnable Python sample retains its own provider and customer-onboarding gates.
+
 September 30, 2026: the published website now uses a browser-only workspace with no account or paid AI API, complete ZIP backup/restore and local document/package storage. The early-access form and invitation requirement are removed. See [current browser guide](docs/HOSTED-WORKSPACE.md).
 
 ## Historical September 19 notes

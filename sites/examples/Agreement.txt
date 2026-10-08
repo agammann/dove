@@ -1,0 +1,6 @@
+Fictional contract for the logo and style guide.
+Example Customer requires delivery of the finished logo and style guide.
+The final billing amount is USD 2400.00, including all applicable taxes.
+Submit purchase order PO-1042 with the final invoice.
+The authorized billing recipient is Example Contact at contact@example.invalid.
+Payment is due 30 days after the invoice date.

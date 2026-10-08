@@ -1,4 +1,14 @@
-# Invitation beta release checklist
+# Release checks
+
+## Browser v1
+
+The v1 boundary is a single-device browser workspace: source-linked document review, optional device/visitor-key analysis, human decisions, invoice/package export and complete backup restoration. The source ZIP includes locked dependencies and the MIT license.
+
+Before publication, require clean installs, tests, TypeScript, lint and build; run the documented browser journey and a fresh ZIP consumer. Verify the actual landing tool in supported Chrome, both offered device models on real WebGPU, and first hosted responses separately from injected provider tests. Confirm published-site navigation, storage, package and backup behavior after deploying the exact release source. Preserve the older D1/R2 resources.
+
+Available dependency patches must be applied. Production-site acceptance, model quality and source checks are distinct results; record what was actually run in the [dated verification](verification/v1-2026-10-07.md).
+
+## Separate Python invitation sample
 
 For the published no-login browser workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
@@ -12,4 +22,4 @@ The documented local fixture workflow is verified. The application is not deploy
 6. Publish the applicable privacy notice, support contact, provider terms and pilot agreement. Confirm access request retention and deletion operations.
 7. Run the workflow with each invited business. Collect correction rates, operator time, blockers and feedback using the pilot kit. Technical demonstration does not establish demand.
 
-Public source publication is authorized separately from hosting and customer email. No open source license has been selected for the original code. Retain dependency notices.
+Customer email and full Python application hosting require their own provider configuration and verification. The original source uses [MIT](../LICENSE); retain dependency notices.
