@@ -143,11 +143,19 @@ jobs:
           name: dove-release
           path: release-artifacts/
           if-no-files-found: error
+      - name: Collect consumer verification inside the checkout
+        if: always()
+        run: |
+          $outputs = Join-Path (Split-Path $env:GITHUB_WORKSPACE -Parent) 'dove-source-consumer/sites/outputs'
+          if (Test-Path -LiteralPath $outputs) {
+            New-Item -ItemType Directory -Path verification-artifacts -Force | Out-Null
+            Copy-Item -LiteralPath $outputs -Destination verification-artifacts -Recurse
+          }
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: dove-source-consumer-verification
-          path: ../dove-source-consumer/sites/outputs/
+          path: verification-artifacts/
 
   publish:
     needs: [python-sample, browser-workspace, source-release]
