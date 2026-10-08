@@ -4,6 +4,10 @@
 
 From completed work to completed paperwork. Dove opens directly in your browser: **no login, no ChatGPT account and no invitation**. Device analysis and manual review need no API key. Optional OpenAI analysis uses your own API key and is billed to your account.
 
+## Try the included examples
+
+Follow the [browser quickstart](../docs/BROWSER-QUICKSTART.md) for a complete fictional job without a model download or API key. The source ZIP includes three readable examples in `sites/examples/`.
+
 ## Use Dove
 
 1. Open the workspace. In Settings, enter your business name and billing details for invoices.
@@ -36,7 +40,7 @@ Device analysis processes source sections and proposes at most six requirements 
 
 ## Optional hosted analysis
 
-Choose **OpenAI with your key** explicitly to use GPT-5.4 (the default) or GPT-5.4 mini without a local model download. Each analysis reads all documents together in one paid request; your OpenAI account pays for usage. Hosted analysis accepts up to 32,000 extracted characters across the work item. The interface shows the character count and rejects larger work before sending anything; it never silently truncates documents. Use device analysis or review larger work manually. Check [current API pricing](https://openai.com/api/pricing/) before analyzing large documents. The server uses a fixed OpenAI endpoint and only the key supplied with that request. There is no owner-key or environment-key fallback.
+Choose **OpenAI with your key** explicitly to use GPT-5.4 (the default) or GPT-5.4 mini without a local model download. Prefer GPT-5.4 for comparisons across documents. In the October 7 check, mini identified conflicting payment dates but omitted the calculated due date; check date arithmetic yourself. Each analysis reads all documents together in one paid request; your OpenAI account pays for usage. Hosted analysis accepts up to 32,000 extracted characters across the work item. The interface shows the character count and rejects larger work before sending anything; it never silently truncates documents. Use device analysis or review larger work manually. Check [current API pricing](https://openai.com/api/pricing/) before analyzing large documents. The server uses a fixed OpenAI endpoint and only the key supplied with that request. There is no owner-key or environment-key fallback.
 
 This mode sends the complete extracted document text and filenames, plus the work title, customer and description, through the Dove server to OpenAI. Work context identifies the job but does not count as source evidence. The API request uses `store: false`; OpenAI's applicable data policies still apply. Your key stays in tab memory and is sent in an authorization header. It is excluded from IndexedDB, workspace backups and saved proposals. Clear it with **Clear key**, switch back to device mode or reload the page. The application does not log the key.
 
@@ -75,9 +79,9 @@ npm run build
 node scripts/preview-built.mjs
 ```
 
-In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. `npm test` also checks explicit page routing, slash redirects, retired API responses and visitor-key validation. Model inference is a separate hardware-dependent check.
+In another terminal, run `node scripts/verify-browser.mjs`. It uses installed Microsoft Edge by default; set `DOVE_TEST_CHANNEL=chrome` for Chrome or `DOVE_TEST_EXECUTABLE` to an installed browser executable, or install Edge/Chrome first. The test accepts only localhost, creates an isolated browser profile and uses fictional data. It checks storage, quote/revision validation, PDF creation/extraction, package review/download, complete backup restoration and the absence of workspace API/authentication requests. `npm test` also checks explicit page routing, slash redirects, retired API responses and visitor-key validation. Model inference is a separate hardware-dependent check.
 
-To test actual model downloads and generation, run `node scripts/verify-model.mjs` against that same compiled preview with installed Chrome and a real WebGPU adapter. It downloads both offered models, creates fictional work through the interface, uploads a TXT source, checks generated quotes and human review requirements, and verifies download and analysis cancellation. Allow several GB of model downloads and enough free graphics memory. This manual check is separate from CI's proposal fixtures.
+To test actual model downloads and generation, run `node scripts/verify-model.mjs` against that same compiled preview with installed Chrome and a real WebGPU adapter. It downloads both offered models, creates fictional work through the interface, uploads a TXT source, checks generated quotes and human review requirements, and verifies download and analysis cancellation. Set `DOVE_TEST_HEADLESS=1` when running without a visible window. Allow several GB of model downloads and enough free graphics memory. This manual check is separate from CI's proposal fixtures.
 
 ## Hosting and legacy data
 
@@ -87,7 +91,13 @@ Earlier authenticated D1/R2 workspace records and access requests are **not dele
 
 The Python/PostgreSQL application in the parent repository is a separate legacy implementation with its own authentication and optional providers. These browser changes do not convert that application.
 
+Run `node scripts/verify-native.mjs` against the compiled local preview to check the genuine native WebMCP landing tool. It requires Chrome 154 or 155 and enables the testing flag in its disposable context. The tool changes the landing illustration only; it cannot analyze documents or approve packages.
+
+Original source uses the [MIT license](../LICENSE); dependencies retain their [notices](../THIRD-PARTY-NOTICES/README.md). See [v1 scope and recovery](../docs/STABILITY.md).
+
 ## Verification
+
+[October 7 v1 verification](../docs/verification/v1-2026-10-07.md) records current source, ordinary browser, actual device and hosted-model checks separately. Earlier records below remain historical.
 
 The [October 3 invoice-timing record](../docs/verification/hosted-invoice-timing-2026-10-03.md) preserves the earlier 15-of-16 result and a later five-case check whose three-page conflict had a misleading affirmative title. After the title correction, two new first GPT-5.4 responses met their frozen criteria, including the explicit November 1 calculation and all three source references. Separate model-free Package/backup checks passed; none of these bounded checks establishes general accuracy or completeness. [Build-migration verification](../docs/verification/browser-build-migration-2026-10-03.md) records the later runtime change and a genuine native WebMCP check in Chrome 154.0.8037.98 with its testing flag, separately from published-site and model results.
 

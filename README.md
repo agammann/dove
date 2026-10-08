@@ -8,6 +8,14 @@ Dove helps service businesses gather missing purchase orders, review acceptance 
 
 ![Dove browser workspace with fictional documents](sites/public/product-screenshot.png)
 
+## Try a fictional job
+
+Follow the [browser quickstart](docs/BROWSER-QUICKSTART.md) to upload the included examples, review a checklist manually, generate an invoice, approve the exact package and restore a complete backup. The walkthrough needs no model or API key.
+
+For development, enter `sites/`, run `npm ci` and `npm run dev`, then open `http://127.0.0.1:5173/workspace/`. Node.js 22.13 or newer is required. See [browser development](sites/README.md#local-development) for builds and checks.
+
+Download the v1 source ZIP from [Releases](https://github.com/agammann/dove/releases), verify `SHA256SUMS`, and extract it before using those commands. The ZIP includes both the browser workspace and separate Docker sample.
+
 ## What is available
 
 | Part | Status |
@@ -74,6 +82,6 @@ Provider acceptance, confirmed email delivery, customer acceptance and payment a
 
 ## Scope and source terms
 
-This preview supports human reviewed document requirements and billing packages. OCR, mailbox synchronization, accounting integrations, tax decisions, payment collection and granular organization roles are outside this release.
+Dove v1 supports browser document review and billing packages on one device, with complete backup and restoration. The Python application remains a separately runnable example; its live email and provider setup is outside browser v1. OCR, mailbox synchronization, accounting integrations, tax decisions, payment collection and granular organization roles are outside this release.
 
-The repository is public. No open source license has been selected for Dove's original source. Dependency licenses remain applicable; their [notices](THIRD-PARTY-NOTICES/README.md) are retained.
+Dove's original source is available under the [MIT license](LICENSE). Dependency licenses and [notices](THIRD-PARTY-NOTICES/README.md) remain applicable. Read [v1 scope, upgrading and recovery](docs/STABILITY.md) before changing a saved workspace.

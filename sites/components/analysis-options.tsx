@@ -25,6 +25,7 @@ export default function AnalysisOptions({ sourceCharacters, mode, apiKey, model,
         <label>Hosted model<select value={model} disabled={busy} onChange={event => onModel(event.target.value)}><option value="gpt-5.4">GPT-5.4</option><option value="gpt-5.4-mini">GPT-5.4 mini · lower cost</option></select></label>
         <label>Your OpenAI API key<input type="password" value={apiKey} autoComplete="off" spellCheck={false} maxLength={515} disabled={busy} onChange={event => onKey(event.target.value)} aria-describedby="hosted-analysis-privacy" placeholder="Paste your API key"/></label>
       </div>
+      {model === 'gpt-5.4-mini' && <p className="d-muted">Mini can omit calculated due dates. Check payment dates yourself; use GPT-5.4 for comparisons across documents.</p>}
       <button type="button" disabled={busy || !apiKey} onClick={() => onKey('')}>Clear key</button>
       <p id="hosted-analysis-privacy" className="d-muted">Analyze with OpenAI sends all extracted document text and filenames, plus the work title, customer and description, through Dove&apos;s server to OpenAI. Each analysis makes one paid API request using your account. Your key stays in this tab&apos;s memory and is sent only for analysis; Dove does not save it in workspace data or backups. Clear key, refresh, or switch to device mode to remove it. Requests disable provider response storage; OpenAI&apos;s data policies still apply. <a href="https://openai.com/api/pricing/" target="_blank" rel="noopener noreferrer">Check current prices</a>.</p>
     </>}

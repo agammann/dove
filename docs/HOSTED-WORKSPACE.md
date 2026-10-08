@@ -4,6 +4,8 @@
 
 Dove opens without a login, ChatGPT account or invitation. Device analysis and manual review need no paid AI API. Workspace records and uploaded files are saved in the visitor’s browser. Optional hosted analysis sends extracted text to OpenAI using the visitor’s own key and billing account.
 
+Start with the [fictional browser quickstart](BROWSER-QUICKSTART.md) or read [v1 scope and recovery](STABILITY.md).
+
 ## First use
 
 1. Open the workspace and enter business/billing details in Settings.

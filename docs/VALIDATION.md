@@ -1,5 +1,7 @@
 # Dove validation
 
+See [October 7 v1 verification](verification/v1-2026-10-07.md) for the current browser release scope and fresh checks. The dated sample results below remain historical.
+
 For the published no-login browser workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
 Updated September 19, 2026, Pacific time. These checks use fictional data. The public access website and the local document workspace are separate services.
