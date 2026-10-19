@@ -9,8 +9,8 @@ RUN pnpm build
 FROM python:3.12.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app/backend
-COPY backend/requirements.lock ./
-RUN pip install --no-cache-dir --require-hashes -r requirements.lock
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir --require-hashes -r requirements.txt
 COPY backend/ ./
 COPY --from=frontend /frontend/dist /app/frontend/dist
 RUN useradd --create-home --uid 10001 dove && mkdir -p /data/objects && chown -R dove:dove /data /app

@@ -42,7 +42,7 @@ pnpm build
 From `backend/`, create a Python virtual environment and activate it. On Windows use `py -3.12 -m venv .venv` then `.\.venv\Scripts\Activate.ps1`. On macOS/Linux use `python3.12 -m venv .venv` then `. .venv/bin/activate`. In that environment:
 
 ```sh
-python -m pip install --require-hashes -r requirements.lock
+python -m pip install --require-hashes -r requirements.txt
 python -m alembic upgrade head
 python -m dove.cli seed
 python -m uvicorn dove.main:app --host 127.0.0.1 --port 8000
@@ -51,6 +51,16 @@ python -m uvicorn dove.main:app --host 127.0.0.1 --port 8000
 In a second terminal, activate the same environment, enter `backend/` and run `python -m dove.worker`. Open `http://127.0.0.1:8000`. Both processes must share database, storage and origin settings. Native defaults use `backend/.data/`; the root Compose `.env` is not automatically loaded when running from `backend/`. If port 8000 is occupied, stop your local Docker stack or align the native server port and `PUBLIC_URL`.
 
 Run `python -m pytest tests -q` from `backend/` for native tests. From `frontend/`, `pnpm check` checks TypeScript and `pnpm build` compiles the UI. Preserve both dependency lockfiles.
+
+`backend/requirements.in` declares the Python dependencies; `backend/requirements.txt` is the committed, hash-pinned install file. Keep the standard `.txt` name so Dependabot can update the installed dependencies. After changing `requirements.in`, regenerate the install file in the Python 3.12 environment from `backend/`:
+
+```sh
+python -m piptools compile --allow-unsafe --generate-hashes --output-file=requirements.txt requirements.in
+```
+
+Commit both files when their contents change, keep `--require-hashes` on installs, and rerun the checks above. This command preserves compatible existing pins; use `--upgrade-package PACKAGE` for an intentional package update.
+
+Keep `colorama` explicit in the input so Linux regeneration retains the hashes needed by pytest on Windows. The shared install file supports both the Docker sample and native development.
 
 GitHub Actions also builds and starts the documented Compose stack, tests SQLite and a disposable PostgreSQL database, seeds the sample, and checks a backup in a separate restored database. A second job builds the browser workspace and runs its storage, package and backup checks against the compiled Worker. Real WebGPU model downloads remain an explicit hardware check; see [browser development](../sites/README.md#local-development).
 
