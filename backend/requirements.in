@@ -14,6 +14,8 @@ httpx
 openai
 svix
 tzdata
+# Keep the shared lock complete when compiled on Linux for native Windows installs.
+colorama
 pytest
 pytest-cov
 pip-tools

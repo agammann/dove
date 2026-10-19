@@ -60,6 +60,8 @@ python -m piptools compile --allow-unsafe --generate-hashes --output-file=requir
 
 Commit both files when their contents change, keep `--require-hashes` on installs, and rerun the checks above. This command preserves compatible existing pins; use `--upgrade-package PACKAGE` for an intentional package update.
 
+Keep `colorama` explicit in the input so Linux regeneration retains the hashes needed by pytest on Windows. The shared install file supports both the Docker sample and native development.
+
 GitHub Actions also builds and starts the documented Compose stack, tests SQLite and a disposable PostgreSQL database, seeds the sample, and checks a backup in a separate restored database. A second job builds the browser workspace and runs its storage, package and backup checks against the compiled Worker. Real WebGPU model downloads remain an explicit hardware check; see [browser development](../sites/README.md#local-development).
 
 `pnpm dev` is optional: it proxies `/api` to port 8000. The backend's `PUBLIC_URL` must match the exact Vite origin, including its actual port. Restart the backend after environment changes. The documented full workflow uses the compiled frontend served by FastAPI.
