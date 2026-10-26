@@ -20,4 +20,4 @@ pytest
 pytest-cov
 pip-tools
 pypdfium2
-ruff==0.14.0
+ruff==0.17.2
