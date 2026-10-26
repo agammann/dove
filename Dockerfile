@@ -1,4 +1,4 @@
-FROM node:22.19.0-alpine AS frontend
+FROM node:26.12.1-alpine AS frontend
 WORKDIR /frontend
 RUN corepack enable && corepack prepare pnpm@10.16.1 --activate
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
