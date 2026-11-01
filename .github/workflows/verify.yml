@@ -14,13 +14,17 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Generate unique local database credentials
+        run: |
+          python3 -m unittest scripts/test_setup_env.py
+          python3 scripts/setup_env.py
       - name: Start documented Docker sample
         run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Verify SQLite and disposable PostgreSQL databases
         run: |
           docker compose run --rm --no-deps -T api python -m pytest tests -q
           docker compose exec -T db createdb -U dove dove_test
-          docker compose run --rm --no-deps -T -e TEST_DATABASE_URL=postgresql+psycopg://dove:local-dove-password@db/dove_test api python -m pytest tests -q
+          docker compose run --rm --no-deps -T api sh -c 'TEST_DATABASE_URL="${DATABASE_URL%/*}/dove_test" python -m pytest tests -q'
       - name: Verify seeded application and isolated recovery
         run: |
           docker compose exec -T api python -m dove.cli seed
