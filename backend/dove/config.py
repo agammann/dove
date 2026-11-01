@@ -1,5 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine.url import make_url
 
 
 class Settings(BaseSettings):
@@ -48,6 +49,10 @@ class Settings(BaseSettings):
                 "postgresql"
             ) or not self.public_url.startswith("https://"):
                 raise RuntimeError("Production requires PostgreSQL and HTTPS")
+            if len(make_url(self.database_url).password or "") < 24:
+                raise RuntimeError(
+                    "Production requires a unique database password of at least 24 characters"
+                )
             if self.model_adapter != "openai" or self.email_adapter != "resend":
                 raise RuntimeError("Production cannot use simulated adapters")
             if not all(

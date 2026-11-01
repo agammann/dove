@@ -39,11 +39,12 @@ Install Git and Docker with the Linux engine and a current Docker Compose plugin
 ```sh
 git clone https://github.com/agammann/dove.git
 cd dove
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace python:3.12.11-slim python scripts/setup_env.py
 docker compose up --build --detach --wait --wait-timeout 180
 docker compose exec api python -m dove.cli seed
 ```
 
-Run the seed command only after startup succeeds. Open `http://127.0.0.1:8000`, choose **Design studio**, and sign in with the fictional sample password `Dove-local-sample-2026!`. No API key or real email is required.
+The setup command creates an ignored `.env` with a unique local database password and preserves an existing file. For Windows PowerShell, use the [first run guide's setup command](docs/QUICKSTART.md#create-local-configuration). Run the seed command only after startup succeeds. Open `http://127.0.0.1:8000`, choose **Design studio**, and sign in with the fictional sample password `Dove-local-sample-2026!`. No API key or real email is required.
 
 If port 8000 is occupied, configure an alternate port **before startup** using the [first run guide](docs/QUICKSTART.md#choose-a-local-address). That guide covers prerequisites, sample accounts, expected health output, the walkthrough, stopping the app and troubleshooting.
 

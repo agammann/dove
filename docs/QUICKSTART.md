@@ -6,7 +6,7 @@ Use fictional documents in local mode. Analysis and email are simulated; the pub
 
 ## Prerequisites
 
-Install Git and Docker with its Linux container engine. Start Docker, then confirm `docker version` shows a server and `docker compose version` succeeds. Use a current Compose plugin supporting `--wait`. Docker installs Python, Node and pnpm inside the image; those tools are not required on the host for this route.
+Install Git and Docker with its Linux container engine. Start Docker, then confirm `docker version` shows a server and `docker compose version` succeeds. Use a current Compose plugin supporting `--wait`. Docker supplies Python, Node and pnpm; those tools are not required on the host for this route.
 
 ```sh
 git clone https://github.com/agammann/dove.git
@@ -15,9 +15,25 @@ cd dove
 
 Run all following commands beside `compose.yaml`.
 
+## Create local configuration
+
+Before the first Compose command, generate an ignored `.env` with a unique database password. On Linux or in a POSIX shell, run:
+
+```sh
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace python:3.12.11-slim python scripts/setup_env.py
+```
+
+In Windows PowerShell, run:
+
+```powershell
+docker run --rm --mount "type=bind,source=$((Get-Location).Path),target=/workspace" --workdir /workspace python:3.12.11-slim python scripts/setup_env.py
+```
+
+The setup command preserves an existing `.env`. If one already exists, ensure it contains a unique `POSTGRES_PASSWORD` of at least 24 URL-safe characters. Keep the file private; never commit it. A blank or missing password stops Compose configuration.
+
 ## Choose a local address
 
-The default app address is `http://127.0.0.1:8000`; PostgreSQL uses loopback port 54329. No `.env` is needed for the defaults. If app port 8000 is occupied, copy `.env.example` to `.env` and change both lines before startup:
+The default app address is `http://127.0.0.1:8000`; PostgreSQL uses loopback port 54329. If app port 8000 is occupied, edit the generated `.env` and change both lines before startup:
 
 ```dotenv
 DOVE_PORT=8010
@@ -65,6 +81,8 @@ Local completion means simulated provider acceptance, not real email delivery or
 ## Stop and resume
 
 `docker compose down` stops the stack and retains database/object volumes. Resume with the startup command. Do not add `--volumes` if retaining data.
+
+If you used an older sample database volume with the repository's former shared password, first back up any work you need to retain. Generate `.env` as above, run `docker compose stop api worker`, then start only the database with `docker compose up --detach --wait db`. Open `docker compose exec db psql -U dove -d dove` and run `\password dove`; enter the new value from your private `.env` twice at the prompts, then `\q`. Start the full stack. Changing `.env` alone does not change a password already stored in a PostgreSQL volume. Do not remove the volume to rotate credentials.
 
 To deliberately delete and recreate only the three fictional sample workspaces, use `docker compose exec api python -m dove.cli reset-samples`. It refuses production mode and non-sample organizations. This is not a networking repair command.
 

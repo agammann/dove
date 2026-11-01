@@ -17,14 +17,14 @@ The default fixture uses a temporary SQLite database and object directory, with 
 
 For PostgreSQL checks, use a dedicated disposable database. Test fixtures drop and recreate tables in the database selected by `TEST_DATABASE_URL`. Never select the application or a production database.
 
-With the default local database password:
+With the generated local database password, derive the test database URL inside the container without copying the secret into a command:
 
 ```sh
 docker compose exec db createdb -U dove dove_test
-docker compose run --rm --no-deps -T -e TEST_DATABASE_URL=postgresql+psycopg://dove:local-dove-password@db/dove_test api python -m pytest tests -q
+docker compose run --rm --no-deps -T api sh -c 'TEST_DATABASE_URL="${DATABASE_URL%/*}/dove_test" python -m pytest tests -q'
 ```
 
-If that database already exists, confirm it is disposable before testing. With a custom password, configure the test connection securely instead of copying the example URL.
+If that database already exists, confirm it is disposable before testing. The test command uses the generated password in the app container's environment; do not paste it into logs or shared terminals.
 
 ## Native development
 

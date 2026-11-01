@@ -17,7 +17,7 @@ Use the [first run guide](QUICKSTART.md) for local fixtures, ports, sample accou
 ## Production configuration
 
 1. After provisioning is explicitly authorized, create the host, choose a region agreed with pilot customers, install Docker from the official distribution, and restrict inbound traffic to SSH from administrators plus HTTPS/HTTP for Caddy. Do not expose PostgreSQL or private volumes.
-2. Clone the reviewed source commit. Create an ignored `.env` on the server or inject environment values using the host secret manager. Generate a random `SECRET_KEY` of at least 40 characters and a strong `POSTGRES_PASSWORD`.
+2. Clone the reviewed source commit. Create an ignored `.env` on the server or inject environment values using the host secret manager. Generate a random `SECRET_KEY` of at least 40 characters and a unique URL-safe `POSTGRES_PASSWORD` of at least 24 characters. Do not reuse the local sample's password. Compose and production startup require this value.
 3. Set `ENVIRONMENT=production`, `PUBLIC_URL=https://your-approved-domain`, `MODEL_ADAPTER=openai`, `EMAIL_ADAPTER=resend`, `OPENAI_MODEL=gpt-4.1-mini`, and provide `OPENAI_API_KEY`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `EMAIL_FROM` and `REPLY_DOMAIN` securely. Never print or commit their values. Production validation refuses local adapters, short/default session secrets, HTTP origins or non-PostgreSQL databases.
 4. Use secure OpenAI Developers setup in Codex for a new key, or the organization's approved secret-management process. Do not copy a key into chat. Set provider project usage caps/alerts in addition to Dove's per-work call allowance.
 5. Verify a Resend sending domain and configure receiving MX records or a provider receiving domain. Set the dedicated reply domain. Register `/api/webhooks/resend` for `email.received`, `email.delivered`, `email.bounced` and `email.failed`; provide the signing secret server-side. DNS changes and provider configuration require review of the exact domain/account.
@@ -36,6 +36,8 @@ docker compose exec api python -c "import urllib.request; print(urllib.request.u
 ~~~
 
 Keep this `COMPOSE_FILE` setting in the deployment and backup environment. Running the base file alone starts the local topology. `config --quiet` validates configuration without printing resolved secret values. Check HTTPS health from outside the host too; internal health does not prove public routing or provider connectivity.
+
+For an existing PostgreSQL volume, changing the environment value alone does not rotate the database role's password. Back up first, stop the API and worker, change the role with `\password dove` in an interactive `docker compose exec db psql -U dove -d dove` session, then update the secret store and restart the stack. Keep the old and new values out of shell history and shared logs.
 
 ## Limits and cost assumptions
 
