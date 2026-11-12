@@ -2,7 +2,7 @@
 # This disposable fixture does not operate on an existing deployment.
 set -euo pipefail
 
-suffix="$(date +%s)-$$-$RANDOM"
+suffix="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
 network="dove-pg-upgrade-test-$suffix"
 old="dove-pg17-test-$suffix"
 new="dove-pg18-test-$suffix"
