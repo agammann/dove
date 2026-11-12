@@ -88,26 +88,33 @@ INSERT INTO retained VALUES ('other database');
 SQL
 
 docker create --name "$new" --network "$network" --network-alias target \
-  -e POSTGRES_USER=restore_admin -e POSTGRES_DB=postgres -e POSTGRES_PASSWORD=fixture-admin-password \
+  -e POSTGRES_USER=dove -e POSTGRES_DB=postgres -e POSTGRES_PASSWORD=fixture-admin-password \
   -v "$new_volume:/var/lib/postgresql" postgres:18.4-alpine >/dev/null
 new_created=1
 docker start "$new" >/dev/null
-wait_ready "$new" restore_admin
+wait_ready "$new" dove
 # Use the newer client for the entire cluster (including roles). Dump is synthetic,
 # private to this runner, and removed on exit. Do not upload it as an artifact.
 docker exec -e PGPASSWORD=fixture-admin-password "$new" \
   pg_dumpall -h source -U dove --quote-all-identifiers > "$tmpdir/cluster.sql"
+# Both disposable clusters use the same bootstrap superuser so grants recorded
+# with that grantor remain valid. It already exists on the target; remove only
+# its exact CREATE statement and fail closed if the expected dump shape changes.
+# This is specific to the synthetic fixture, not a general dump rewriting tool.
+awk '$0 == "CREATE ROLE \"dove\";" { found++; next } { print } END { if (found != 1) exit 1 }' \
+  "$tmpdir/cluster.sql" > "$tmpdir/restore.sql"
 # This is a quiescent fixture; stop the old server before restoring/cutover.
 docker stop "$old" >/dev/null
-docker exec -i "$new" psql -X -v ON_ERROR_STOP=1 -U restore_admin -d postgres < "$tmpdir/cluster.sql"
+docker exec -i "$new" psql -X -v ON_ERROR_STOP=1 -U dove -d postgres < "$tmpdir/restore.sql"
 
-assert_eq 18 "$(docker exec "$new" psql -X -U restore_admin -d postgres -Atqc "SELECT current_setting('server_version_num')::int / 10000")" 'target major version'
+assert_eq 18 "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT current_setting('server_version_num')::int / 10000")" 'target major version'
 assert_eq '3|alpha,café,third row' "$(docker exec -e PGPASSWORD=fixture-reader-password "$new" psql -X -h target -U app_reader -d dove -Atqc "SELECT count(*) || '|' || string_agg(item, ',' ORDER BY id) FROM inventory")" 'reader authentication, grants and rows'
 assert_eq '42|t' "$(docker exec "$new" psql -X -U dove -d dove -Atqc "SELECT last_value, is_called FROM inventory_id_seq")" 'sequence state'
 assert_eq 'other database' "$(docker exec "$new" psql -X -U dove -d archive -Atqc 'SELECT value FROM retained')" 'second database'
-assert_eq f "$(docker exec "$new" psql -X -U restore_admin -d postgres -Atqc "SELECT rolsuper FROM pg_roles WHERE rolname='app_reader'")" 'reader remains non-superuser'
-assert_eq t "$(docker exec "$new" psql -X -U restore_admin -d postgres -Atqc "SELECT pg_has_role('app_reader', 'reporting', 'MEMBER')")" 'role membership'
-assert_eq dove "$(docker exec "$new" psql -X -U restore_admin -d dove -Atqc "SELECT pg_get_userbyid(relowner) FROM pg_class WHERE oid='public.inventory'::regclass")" 'table ownership'
+assert_eq f "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT rolsuper FROM pg_roles WHERE rolname='app_reader'")" 'reader remains non-superuser'
+assert_eq t "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT pg_has_role('app_reader', 'reporting', 'MEMBER')")" 'role membership'
+assert_eq 'dove|false|true|true' "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT pg_get_userbyid(grantor) || '|' || admin_option || '|' || inherit_option || '|' || set_option FROM pg_auth_members WHERE roleid='reporting'::regrole AND member='app_reader'::regrole")" 'membership grantor and options'
+assert_eq dove "$(docker exec "$new" psql -X -U dove -d dove -Atqc "SELECT pg_get_userbyid(relowner) FROM pg_class WHERE oid='public.inventory'::regclass")" 'table ownership'
 assert_eq 1 "$(docker exec -e PGPASSWORD=fixture-admin-password "$new" psql -X -h target -U dove -d dove -Atqc 'SELECT 1')" 'restored admin password authentication'
 # Rollback is safe only before writes to the new cluster: restart the untouched
 # source volume and confirm its data. Later writes need a separate recovery plan.
