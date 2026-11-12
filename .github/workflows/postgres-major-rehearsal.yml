@@ -2,6 +2,10 @@ name: PostgreSQL major upgrade rehearsal
 on:
   pull_request:
     paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'backend/**'
+      - 'frontend/**'
       - 'scripts/test_postgres_major_upgrade.sh'
       - '.github/workflows/postgres-major-rehearsal.yml'
   workflow_dispatch:
