@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: dove
       POSTGRES_USER: dove
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dove-password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup_env.py or set a unique database password}
     volumes:
       - postgres:/var/lib/postgresql/data
     healthcheck:
@@ -20,7 +20,7 @@ services:
     build: .
     init: true
     environment: &app-environment
-      DATABASE_URL: postgresql+psycopg://dove:${POSTGRES_PASSWORD:-local-dove-password}@db/dove
+      DATABASE_URL: postgresql+psycopg://dove:${POSTGRES_PASSWORD:?Run scripts/setup_env.py or set a unique database password}@db/dove
       STORAGE_DIR: /data/objects
       ENVIRONMENT: ${ENVIRONMENT:-local}
       SECRET_KEY: ${SECRET_KEY:-local-only-do-not-deploy-change-this-value}
