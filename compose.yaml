@@ -15,7 +15,7 @@ services:
       timeout: 3s
       retries: 20
     ports:
-      - "127.0.0.1:54329:5432"
+      - "127.0.0.1:${DOVE_DB_PORT:-54329}:5432"
   api:
     build: .
     init: true
