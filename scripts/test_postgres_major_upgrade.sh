@@ -25,11 +25,11 @@ cleanup() {
 trap cleanup EXIT
 
 wait_ready() {
-  local container="$1" user="$2"
+  local container="$1" user="$2" password="${3:-fixture-admin-password}"
   for _ in {1..60}; do
     if docker exec "$container" pg_isready -U "$user" -d postgres >/dev/null 2>&1; then
       # pg_isready can succeed during initdb's temporary server. Require TCP.
-      if docker exec -e PGPASSWORD=fixture-admin-password "$container" \
+      if docker exec -e PGPASSWORD="$password" "$container" \
           psql -X -h 127.0.0.1 -U "$user" -d postgres -Atqc 'SELECT 1' >/dev/null 2>&1; then
         return 0
       fi
@@ -88,11 +88,11 @@ INSERT INTO retained VALUES ('other database');
 SQL
 
 docker create --name "$new" --network "$network" --network-alias target \
-  -e POSTGRES_USER=dove -e POSTGRES_DB=postgres -e POSTGRES_PASSWORD=fixture-admin-password \
+  -e POSTGRES_USER=dove -e POSTGRES_DB=postgres -e POSTGRES_PASSWORD=fixture-target-bootstrap-password \
   -v "$new_volume:/var/lib/postgresql" postgres:18.4-alpine >/dev/null
 new_created=1
 docker start "$new" >/dev/null
-wait_ready "$new" dove
+wait_ready "$new" dove fixture-target-bootstrap-password
 # Use the newer client for the entire cluster (including roles). Dump is synthetic,
 # private to this runner, and removed on exit. Do not upload it as an artifact.
 docker exec -e PGPASSWORD=fixture-admin-password "$new" \
@@ -116,6 +116,11 @@ assert_eq t "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT pg_h
 assert_eq 'dove|false|true|true' "$(docker exec "$new" psql -X -U dove -d postgres -Atqc "SELECT pg_get_userbyid(grantor) || '|' || admin_option || '|' || inherit_option || '|' || set_option FROM pg_auth_members WHERE roleid='reporting'::regrole AND member='app_reader'::regrole")" 'membership grantor and options'
 assert_eq dove "$(docker exec "$new" psql -X -U dove -d dove -Atqc "SELECT pg_get_userbyid(relowner) FROM pg_class WHERE oid='public.inventory'::regclass")" 'table ownership'
 assert_eq 1 "$(docker exec -e PGPASSWORD=fixture-admin-password "$new" psql -X -h target -U dove -d dove -Atqc 'SELECT 1')" 'restored admin password authentication'
+if docker exec -e PGPASSWORD=fixture-target-bootstrap-password "$new" \
+    psql -X -h target -U dove -d dove -Atqc 'SELECT 1' >/dev/null 2>&1; then
+  echo 'Target bootstrap password unexpectedly remains valid after restore.' >&2
+  exit 1
+fi
 # Rollback is safe only before writes to the new cluster: restart the untouched
 # source volume and confirm its data. Later writes need a separate recovery plan.
 docker stop "$new" >/dev/null
