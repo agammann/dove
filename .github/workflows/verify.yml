@@ -14,12 +14,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: Verify retained PostgreSQL credential rotation
-        run: bash scripts/test_legacy_db_migration.sh
       - name: Generate unique local database credentials
         run: |
           python3 -m unittest scripts/test_setup_env.py
           python3 scripts/setup_env.py
+      - name: Verify retained PostgreSQL credential rotation
+        run: bash scripts/test_legacy_db_migration.sh
       - name: Start documented Docker sample
         run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Verify SQLite and disposable PostgreSQL databases

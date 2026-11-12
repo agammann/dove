@@ -20,11 +20,17 @@ new_compose up --detach --wait --wait-timeout 180 db
 printf "ALTER ROLE dove PASSWORD :'new_password';\n" | \
   new_compose exec -T db psql -U dove -d dove -v ON_ERROR_STOP=1 -v new_password="$new"
 
-if new_compose exec -T -e PGPASSWORD="$old" db psql -h 127.0.0.1 -U dove -d dove -c 'SELECT 1' >/dev/null 2>&1; then
+db_client() {
+  local password="$1"
+  shift
+  docker run --rm --network "${project}_default" -e "PGPASSWORD=$password" postgres:17.6-alpine \
+    psql -h db -U dove -d dove -v ON_ERROR_STOP=1 "$@"
+}
+if db_client "$old" -c 'SELECT 1' >/dev/null 2>&1; then
   echo "Old password unexpectedly authenticated after rotation" >&2
   exit 1
 fi
-value=$(new_compose exec -T -e PGPASSWORD="$new" db psql -h 127.0.0.1 -U dove -d dove -At -v ON_ERROR_STOP=1 -c 'SELECT value FROM migration_probe')
+value=$(db_client "$new" -At -c 'SELECT value FROM migration_probe')
 test "$value" = retained
 new_compose up --build --detach --wait --wait-timeout 180 api worker
 new_compose exec -T api python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"
