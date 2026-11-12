@@ -24,6 +24,8 @@ DOVE_PORT=8010
 PUBLIC_URL=http://127.0.0.1:8010
 ```
 
+If Windows reserves the PostgreSQL host port or another service uses it, set `DOVE_DB_PORT` to an available loopback port in that `.env`, for example `DOVE_DB_PORT=55429`. You do not need to edit Compose or change `DATABASE_URL`: containers still connect to `db:5432`.
+
 Keep `ENVIRONMENT=local`, `MODEL_ADAPTER=fixture`, and `EMAIL_ADAPTER=local`. Review an existing `.env` before editing it. Always open exactly `PUBLIC_URL`: `localhost` and `127.0.0.1` are different origins.
 
 ## Start and check health
@@ -75,7 +77,7 @@ To deliberately delete and recreate only the three fictional sample workspaces, 
 | Docker daemon unavailable | Start Docker and confirm the Linux engine. |
 | Unknown `--wait` option | Update Docker Compose. |
 | Port 8000 occupied | Set both alternate port values above, then rerun startup. |
-| Port 54329 occupied | Identify the conflicting service; change only Dove's loopback host port in `compose.yaml`, keeping container port 5432. |
+| PostgreSQL host port occupied or access forbidden | Set `DOVE_DB_PORT` to an available port in `.env`, then rerun startup. The binding remains loopback only; container port 5432 stays unchanged. |
 | Writes return 403 | Match the browser address exactly to `PUBLIC_URL`, then restart after environment changes. |
 | API unhealthy | Inspect `docker compose logs --tail=80 api db` before seeding. |
 | Pending work | Check worker logs and work/organization pause settings. |
