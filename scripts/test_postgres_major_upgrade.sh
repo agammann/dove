@@ -102,7 +102,7 @@ from dove.db import Organization, Record, User, transaction
 with transaction() as db:
     db.add(Organization(id="migration-fixture-org", name="Migration fixture", data={"sample": True}))
     db.add(User(id="migration-fixture-user", org_id="migration-fixture-org",
-                email="fixture@dove.example", password_hash=passwords.hash("synthetic-only-password")))
+                email="fixture@example.com", password_hash=passwords.hash("synthetic-only-password")))
     db.add(Record(id="migration-fixture-record", org_id="migration-fixture-org",
                   kind="work", data={"title": "Retained fixture work", "customer": "Synthetic customer"}))
 PY_SOURCE
@@ -154,7 +154,7 @@ from dove.main import app
 
 with SessionLocal() as db:
     org = db.get(Organization, "migration-fixture-org")
-    user = db.scalar(select(User).where(User.email == "fixture@dove.example"))
+    user = db.scalar(select(User).where(User.email == "fixture@example.com"))
     record = db.get(Record, "migration-fixture-record")
     assert org and org.name == "Migration fixture" and org.data["sample"] is True
     assert user and user.org_id == org.id and passwords.verify("synthetic-only-password", user.password_hash)
@@ -174,3 +174,53 @@ assert_eq 17 "$(docker exec "$old" psql -X -U dove -d postgres -Atqc "SELECT cur
 assert_eq '3|alpha,café,third row' "$(docker exec -e PGPASSWORD=fixture-reader-password "$old" psql -X -h source -U app_reader -d dove -Atqc "SELECT count(*) || '|' || string_agg(item, ',' ORDER BY id) FROM inventory")" 'rollback data and reader authentication'
 assert_eq 'other database' "$(docker exec "$old" psql -X -U dove -d archive -Atqc 'SELECT value FROM retained')" 'rollback second database'
 echo 'Synthetic PostgreSQL 17 to 18 restore and pre-write rollback passed.'
+
+
+# The pre-write rollback has now been exercised. Shut down the old instance
+# before starting the upgraded one, and make synthetic target-side writes.
+# This models neither reverse migration nor rollback after writes.
+docker stop "$old" >/dev/null
+docker start "$new" >/dev/null
+wait_ready "$new" dove fixture-admin-password
+
+docker run --rm -i --network "$network" \
+  -e DATABASE_URL=postgresql+psycopg://dove:fixture-admin-password@target/dove \
+  "$app_image" python - <<'PY_WRITE'
+from fastapi.testclient import TestClient
+from dove.main import app
+
+with TestClient(app) as client:
+    headers = {"x-dove-action": "1"}
+    login = client.post("/api/auth/login", headers=headers,
+                        json={"email": "fixture@example.com", "password": "synthetic-only-password"})
+    assert login.status_code == 200, login.text
+    assert client.get("/api/me").json()["organization"]["id"] == "migration-fixture-org"
+    contact = client.post("/api/contacts", headers=headers,
+                          json={"customer": "Synthetic customer", "name": "Rehearsal contact",
+                                "email": "contact@example.com"})
+    assert contact.status_code == 201, contact.text
+    work = client.post("/api/work", headers=headers,
+                       json={"title": "Post-upgrade synthetic work", "description": "Disposable test",
+                             "contact_id": contact.json()["id"], "currency": "USD"})
+    assert work.status_code == 201, work.text
+    assert work.json()["title"] == "Post-upgrade synthetic work"
+PY_WRITE
+
+docker stop "$new" >/dev/null
+docker start "$new" >/dev/null
+wait_ready "$new" dove fixture-admin-password
+docker run --rm -i --network "$network" \
+  -e DATABASE_URL=postgresql+psycopg://dove:fixture-admin-password@target/dove \
+  "$app_image" python - <<'PY_PERSIST'
+from fastapi.testclient import TestClient
+from dove.main import app
+
+with TestClient(app) as client:
+    login = client.post("/api/auth/login", headers={"x-dove-action": "1"},
+                        json={"email": "fixture@example.com", "password": "synthetic-only-password"})
+    assert login.status_code == 200, login.text
+    response = client.get("/api/work")
+    assert response.status_code == 200, response.text
+    assert any(item.get("title") == "Post-upgrade synthetic work" for item in response.json())
+PY_PERSIST
+echo 'Synthetic post-upgrade authentication and writes survived a target restart.'
