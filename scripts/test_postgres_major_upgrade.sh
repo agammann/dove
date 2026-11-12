@@ -87,6 +87,26 @@ CREATE TABLE retained (value text NOT NULL);
 INSERT INTO retained VALUES ('other database');
 SQL
 
+# Build the actual Dove sample and seed a small database-only application fixture.
+# The image and all data are synthetic; this deliberately does not model object storage.
+app_image="$(docker build --quiet .)"
+docker run --rm --network "$network" \
+  -e DATABASE_URL=postgresql+psycopg://dove:fixture-admin-password@source/dove \
+  "$app_image" python -m alembic upgrade head
+docker run --rm -i --network "$network" \
+  -e DATABASE_URL=postgresql+psycopg://dove:fixture-admin-password@source/dove \
+  "$app_image" python - <<'PY_SOURCE'
+from dove.auth import passwords
+from dove.db import Organization, Record, User, transaction
+
+with transaction() as db:
+    db.add(Organization(id="migration-fixture-org", name="Migration fixture", data={"sample": True}))
+    db.add(User(id="migration-fixture-user", org_id="migration-fixture-org",
+                email="fixture@dove.example", password_hash=passwords.hash("synthetic-only-password")))
+    db.add(Record(id="migration-fixture-record", org_id="migration-fixture-org",
+                  kind="work", data={"title": "Retained fixture work", "customer": "Synthetic customer"}))
+PY_SOURCE
+
 docker create --name "$new" --network "$network" --network-alias target \
   -e POSTGRES_USER=dove -e POSTGRES_DB=postgres -e POSTGRES_PASSWORD=fixture-target-bootstrap-password \
   -v "$new_volume:/var/lib/postgresql" postgres:18.4-alpine >/dev/null
@@ -121,6 +141,30 @@ if docker exec -e PGPASSWORD=fixture-target-bootstrap-password "$new" \
   echo 'Target bootstrap password unexpectedly remains valid after restore.' >&2
   exit 1
 fi
+# Read migrated application data through Dove's ORM and health endpoint.
+# These checks do not create sessions or otherwise write to the target cluster.
+docker run --rm -i --network "$network" \
+  -e DATABASE_URL=postgresql+psycopg://dove:fixture-admin-password@target/dove \
+  "$app_image" python - <<'PY_TARGET'
+from fastapi.testclient import TestClient
+from sqlalchemy import select
+from dove.auth import passwords
+from dove.db import Organization, Record, SessionLocal, User
+from dove.main import app
+
+with SessionLocal() as db:
+    org = db.get(Organization, "migration-fixture-org")
+    user = db.scalar(select(User).where(User.email == "fixture@dove.example"))
+    record = db.get(Record, "migration-fixture-record")
+    assert org and org.name == "Migration fixture" and org.data["sample"] is True
+    assert user and user.org_id == org.id and passwords.verify("synthetic-only-password", user.password_hash)
+    assert record and record.org_id == org.id and record.kind == "work"
+    assert record.data["title"] == "Retained fixture work"
+with TestClient(app) as client:
+    response = client.get("/api/health")
+    assert response.status_code == 200 and response.json()["status"] == "ok"
+PY_TARGET
+
 # Rollback is safe only before writes to the new cluster: restart the untouched
 # source volume and confirm its data. Later writes need a separate recovery plan.
 docker stop "$new" >/dev/null
