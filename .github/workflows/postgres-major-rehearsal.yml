@@ -1,0 +1,17 @@
+name: PostgreSQL major upgrade rehearsal
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_postgres_major_upgrade.sh'
+      - '.github/workflows/postgres-major-rehearsal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Rehearse synthetic PostgreSQL upgrade and rollback
+        run: bash scripts/test_postgres_major_upgrade.sh
