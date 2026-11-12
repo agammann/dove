@@ -191,6 +191,9 @@ from dove.main import app
 
 with TestClient(app) as client:
     headers = {"x-dove-action": "1"}
+    denied = client.post("/api/auth/login", headers=headers,
+                         json={"email": "fixture@example.com", "password": "incorrect-synthetic-password"})
+    assert denied.status_code == 401, denied.text
     login = client.post("/api/auth/login", headers=headers,
                         json={"email": "fixture@example.com", "password": "synthetic-only-password"})
     assert login.status_code == 200, login.text
@@ -219,8 +222,15 @@ with TestClient(app) as client:
     login = client.post("/api/auth/login", headers={"x-dove-action": "1"},
                         json={"email": "fixture@example.com", "password": "synthetic-only-password"})
     assert login.status_code == 200, login.text
+    contacts = client.get("/api/contacts")
+    assert contacts.status_code == 200, contacts.text
+    contact = next((item for item in contacts.json()
+                    if item.get("email") == "contact@example.com"), None)
+    assert contact and contact["name"] == "Rehearsal contact"
     response = client.get("/api/work")
     assert response.status_code == 200, response.text
-    assert any(item.get("title") == "Post-upgrade synthetic work" for item in response.json())
+    work = next((item for item in response.json()
+                 if item.get("title") == "Post-upgrade synthetic work"), None)
+    assert work and work["contact_id"] == contact["id"]
 PY_PERSIST
 echo 'Synthetic post-upgrade authentication and writes survived a target restart.'
