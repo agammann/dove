@@ -23,6 +23,8 @@ jobs:
           python-version: '3.12'
       - name: Install the shared hash-locked dependencies
         run: python -m pip install --require-hashes -r backend/requirements.txt
+      - name: Check backend lint
+        run: python -m ruff check backend
       - name: Run synthetic SQLite tests under the documented native runtime
         working-directory: backend
         run: python -m pytest tests -q

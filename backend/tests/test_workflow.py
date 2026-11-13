@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 from decimal import Decimal
 from sqlalchemy import select
 from dove import worker, providers, workflow as w
-from dove.db import SessionLocal, transaction, Record, get, records, update
+from dove.db import SessionLocal, transaction, Record, records, update
 
 AGREEMENT = "Purchase order required before invoicing.\nCustomer acceptance: final deliverable accepted by Morgan.\nApproved deliverables: final report delivered.\nAgreed amount USD 2400.00.\nBilling recipient: morgan@example.com"
 
@@ -225,7 +225,6 @@ def test_isolation_api_storage_jobs(clients):
     # Forged same-org job referencing a foreign work cannot be processed.
     with transaction() as db:
         jobrow = db.get(Record, job["id"])
-        org = jobrow.org_id
         foreign = ok(b.get("/api/me"))["organization"]["id"]
         jobrow.org_id = foreign
         update(jobrow, status="pending", due=time.time() - 1)
