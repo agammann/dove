@@ -53,7 +53,7 @@ def test_package_allowance_and_no_duplicate_charge(clients, monkeypatch):
     assert duplicate.status_code == 409
     assert "source" in duplicate.text.lower()
     monkeypatch.setattr(settings, "max_package_versions_per_work", 2)
-    first = ok(package(c, work["id"], contact["id"]))
+    ok(package(c, work["id"], contact["id"]))
     assert package(c, work["id"], contact["id"]).status_code == 409
     monkeypatch.setattr(settings, "max_package_versions_per_work", 20)
     monkeypatch.setattr(settings, "max_org_storage_bytes", 1)
