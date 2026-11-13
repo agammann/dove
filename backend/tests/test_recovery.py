@@ -9,14 +9,10 @@ from dove.db import (
     transaction,
     SessionLocal,
     Record,
-    Organization,
-    get,
-    records,
     update,
-    add,
 )
 from dove.config import settings
-from dove import worker, workflow as w, providers
+from dove import worker, providers
 from test_workflow import create, detail, review, package, ok, AGREEMENT
 
 
@@ -73,7 +69,7 @@ def test_multiple_workers_cannot_duplicate_send(clients, monkeypatch):
 
     monkeypatch.setattr(providers, "send_email", send)
     with ThreadPoolExecutor(max_workers=2) as pool:
-        results = list(pool.map(lambda _: worker.tick(), range(2)))
+        list(pool.map(lambda _: worker.tick(), range(2)))
     assert len(calls) == 1
 
 

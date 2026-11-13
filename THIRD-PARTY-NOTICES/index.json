@@ -512,10 +512,10 @@
   {
     "ecosystem": "Python",
     "name": "ruff",
-    "version": "0.14.0",
-    "license": null,
+    "version": "0.15.17",
+    "license": "MIT",
     "notices": [
-      "ruff_0.14.0__ruff_0.14.0.dist_info_licenses_LICENSE"
+      "ruff_0.15.17__ruff_0.15.17.dist_info_licenses_LICENSE"
     ]
   },
   {
