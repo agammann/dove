@@ -61,7 +61,7 @@ class ConfirmationTests(unittest.TestCase):
         for key in ("POSTGRES_PASSWORD", "DATABASE_URL", "PGHOST", "DOVE_PORT", "ENVIRONMENT", "OPENAI_API_KEY"):
             with self.subTest(key=key), self.assertRaises(SystemExit):
                 self.run_helper("local", "NO EXISTING DOVE DATA", extra={key: "synthetic-only"})
-        for key in ("DATABASE_URL", "PGPASSWORD", "DOVE_PG18_FRESH_INSTALL"):
+        for key in ("DATABASE_URL", "PGPASSWORD", "DOVE_PG18_FRESH_INSTALL", "DOCKER_CONFIG", "DOCKER_TLS_VERIFY"):
             with self.subTest(key=key), self.assertRaises(SystemExit):
                 self.run_helper("production", "NO EXISTING DOVE DATA", extra={key: "synthetic-only"})
 
@@ -106,7 +106,13 @@ class ConfirmationTests(unittest.TestCase):
             self.run_helper("production", "NO EXISTING DOVE DATA", resolved=production)
 
     def test_dotenv_selector_stops_before_docker(self):
-        with patch.dict(os.environ, {"PATH": os.environ.get("PATH", "")}, clear=True), patch.object(helper.sys, "argv", [str(path), "local"]), patch.object(helper.Path, "exists", return_value=True), patch.object(helper.Path, "read_text", return_value="COMPOSE_FILE=unexpected\nPOSTGRES_PASSWORD=synthetic"), patch.object(helper, "docker") as docker:
+        with patch.dict(os.environ, {"PATH": os.environ.get("PATH", "")}, clear=True), patch.object(helper.sys, "argv", [str(path), "local"]), patch.object(helper, "automatic_override_present", return_value=False), patch.object(helper.Path, "exists", return_value=True), patch.object(helper.Path, "read_text", return_value="COMPOSE_FILE=unexpected\nPOSTGRES_PASSWORD=synthetic"), patch.object(helper, "docker") as docker:
+            with self.assertRaises(SystemExit):
+                helper.main()
+            docker.assert_not_called()
+
+    def test_automatic_compose_override_stops_before_docker(self):
+        with patch.dict(os.environ, {"PATH": os.environ.get("PATH", "")}, clear=True), patch.object(helper.sys, "argv", [str(path), "local"]), patch.object(helper, "automatic_override_present", return_value=True), patch.object(helper, "docker") as docker:
             with self.assertRaises(SystemExit):
                 helper.main()
             docker.assert_not_called()

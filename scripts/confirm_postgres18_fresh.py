@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 
 
 def forbidden_selector(key):
-    return bool(re.match(r"^(COMPOSE_.*|DOCKER_HOST|DOCKER_CONTEXT|DATABASE_URL|PG[A-Z0-9_]*|POSTGRES_USER|POSTGRES_DB|DOVE_PG18_FRESH_INSTALL)$", key, re.I))
+    return bool(re.match(r"^(COMPOSE_.*|DOCKER_.*|DATABASE_URL|PG[A-Z0-9_]*|POSTGRES_USER|POSTGRES_DB|DOVE_PG18_FRESH_INSTALL)$", key, re.I))
 
 
 def unsafe_dotenv_selector(content):
@@ -19,6 +19,10 @@ def unsafe_dotenv_selector(content):
         if match and forbidden_selector(match.group(1)):
             return match.group(1)
     return None
+
+
+def automatic_override_present():
+    return any(Path(name).exists() for name in ("compose.override.yaml", "compose.override.yml", "docker-compose.override.yaml", "docker-compose.override.yml"))
 
 
 def docker(args, *, env=None, capture=False):
@@ -78,6 +82,8 @@ def main():
         raise SystemExit("Choose exactly local or production.")
     if Path.cwd().resolve() != Path(__file__).resolve().parents[1]:
         raise SystemExit("Run this command from the repository root.")
+    if automatic_override_present():
+        raise SystemExit("Automatic Compose overrides require a separately reviewed procedure.")
     for key in os.environ:
         local_override = sys.argv[1] == "local" and bool(re.match(r"^(POSTGRES_PASSWORD|DOVE_.*|ENVIRONMENT|PUBLIC_URL|MODEL_ADAPTER|EMAIL_ADAPTER|SECRET_KEY|OPENAI_.*|RESEND_.*|EMAIL_FROM|REPLY_DOMAIN)$", key, re.I))
         if forbidden_selector(key) or local_override:
