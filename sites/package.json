@@ -65,7 +65,7 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
-    "globals": "16.4.0",
+    "globals": "17.14.0",
     "typescript-eslint": "8.72.1"
   },
   "type": "module",
