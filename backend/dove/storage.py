@@ -1,6 +1,8 @@
 import hashlib
 from pathlib import Path
+
 from fastapi import HTTPException
+
 from .config import settings
 from .db import uid
 
@@ -59,7 +61,7 @@ def extract(filename, content, org="local"):
         return pages
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - preserve sanitized unreadable-document handling
         msg = (
             str(e)
             if isinstance(e, ValueError)

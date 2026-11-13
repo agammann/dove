@@ -4,14 +4,16 @@ import re
 import secrets
 import time
 import zipfile
-from datetime import datetime, timedelta, date
-from decimal import Decimal, ROUND_HALF_UP
-from zoneinfo import ZoneInfo
+from datetime import date, datetime, timedelta
+from decimal import ROUND_HALF_UP, Decimal
 from email.utils import parseaddr
+from zoneinfo import ZoneInfo
+
 from fastapi import HTTPException
-from sqlalchemy import select
 from reportlab.pdfgen import canvas
-from . import storage, providers
+from sqlalchemy import select
+
+from . import providers, storage
 from .config import settings
 from .db import Organization, Record, add, get, records, update
 
@@ -555,7 +557,7 @@ def process_incoming(db, work, incoming, use_model=True):
                 {**usage, "purpose": "reply interpretation"},
                 work.id,
             )
-        except Exception:
+        except Exception:  # noqa: BLE001 - leave failed interpretation for human review
             explanation = "Automatic interpretation could not finish. Review the full reply manually."
     update(incoming, interpretation=explanation)
     valid_sender = (
@@ -640,7 +642,7 @@ def supported_amount(evidence, amount, currency="USD"):
     candidates = re.findall(
         r"(?:" + prefix + r")\s*(\d[\d,]*(?:\.\d{1,2})?)(?!\d)",
         evidence.data["excerpt"],
-        re.I,
+        re.IGNORECASE,
     )
     return any(money(v.replace(",", "")) == amount for v in candidates)
 
@@ -730,7 +732,7 @@ def build_package(db, work, data, actor):
     total = money(data.confirmed_total)
     if data.mode == "generated":
         require(bool(data.line_items), "A generated invoice needs confirmed line items")
-        subtotal = Decimal("0")
+        subtotal = Decimal(0)
         used_sources = set()
         for line in data.line_items:
             e = get(db, work.org_id, line.evidence_id, "evidence")

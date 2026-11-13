@@ -6,38 +6,42 @@ import zipfile
 from contextlib import asynccontextmanager
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
 from fastapi import (
-    FastAPI,
     Depends,
+    FastAPI,
+    File,
+    Form,
     HTTPException,
     Request,
     Response,
     UploadFile,
-    File,
-    Form,
 )
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from sqlalchemy import select, delete, text
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from sqlalchemy import delete, select, text
 from svix.webhooks import Webhook, WebhookVerificationError
+
+from . import providers, storage
+from . import schemas as s
+from . import workflow as w
+from .auth import authenticate, dummy_hash, passwords, rate_limit, token_hash
 from .config import settings
 from .db import (
-    SessionLocal,
-    Organization,
-    User,
     Invitation,
-    Session,
+    Organization,
     Record,
-    transaction,
+    Session,
+    SessionLocal,
+    User,
     add,
     get,
-    records,
     public,
+    records,
+    transaction,
     update,
 )
-from .auth import authenticate, token_hash, passwords, dummy_hash, rate_limit
-from . import schemas as s, workflow as w, storage, providers
 
 
 @asynccontextmanager
@@ -573,6 +577,7 @@ def file_link(id: str, user=Depends(authenticate)):
 @app.get("/api/packages/{id}/preview-page")
 def preview_package_page(id: str, page: int = 0, user=Depends(authenticate)):
     import base64
+
     from .pdf_process import process_pdf
 
     rate_limit("preview", user.org_id, 60, 60)
@@ -637,7 +642,7 @@ def download(token: str, entry: str | None = None, user=Depends(authenticate)):
 def update_settings(data: s.SettingsInput, user=Depends(authenticate)):
     try:
         ZoneInfo(data.timezone)
-    except Exception:
+    except Exception:  # noqa: BLE001 - preserve the public invalid-timezone response
         raise HTTPException(
             422, "Use a valid IANA timezone, such as America/Los_Angeles"
         )
@@ -829,7 +834,7 @@ async def webhook(request: Request):
         if not isinstance(payload, dict) or not isinstance(
             payload.get("data", {}), dict
         ):
-            raise ValueError("Invalid webhook envelope")
+            raise ValueError("Invalid webhook envelope")  # noqa: TRY004 - handled as an invalid signed envelope
     except (WebhookVerificationError, ValueError):
         raise HTTPException(400, "Invalid webhook signature")
     event_id = request.headers["svix-id"]
@@ -939,7 +944,7 @@ def export_workspace(user=Depends(authenticate)):
     import tempfile
 
     rate_limit("export", user.org_id, 3, 3600)
-    out = tempfile.TemporaryFile()
+    out = tempfile.TemporaryFile()  # noqa: SIM115 - streaming generator closes it after the response
     with SessionLocal() as db:
         rows = list(db.scalars(select(Record).where(Record.org_id == user.org_id)))
         data = {

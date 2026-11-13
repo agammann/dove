@@ -1,8 +1,9 @@
 import secrets
 import time
-from sqlalchemy import select
+
 from dove.auth import token_hash
-from dove.db import transaction, SessionLocal, Invitation, Organization, Record
+from dove.db import Invitation, Organization, Record, SessionLocal, transaction
+from sqlalchemy import select
 from test_workflow import create, detail, ok
 
 
@@ -41,7 +42,7 @@ def test_invitation_single_use_expiry_and_no_public_signup(clients):
 
 def test_download_headers_support_same_origin_preview(clients):
     c = clients[0]
-    work, contact, doc = create(c)
+    _work, _contact, doc = create(c)
     url = ok(c.get("/api/files/" + doc["id"] + "/link"))["url"]
     response = c.get(url)
     assert response.headers["x-frame-options"] == "SAMEORIGIN"
@@ -75,14 +76,14 @@ def test_source_values_cannot_be_invented(clients, monkeypatch):
 
     monkeypatch.setattr(providers, "analyze", bad)
     c = clients[0]
-    work, contact, doc = create(c)
+    work, _contact, _doc = create(c)
     d = detail(c, work["id"])
     assert not d["requirement"] and "grounded" in d["job"][0]["error"]
 
 
 def test_workspace_deletion_removes_auth_and_files(clients):
     c = clients[0]
-    work, contact, doc = create(c)
+    _work, _contact, _doc = create(c)
     org = ok(c.get("/api/me"))["organization"]["id"]
     ok(
         c.delete(

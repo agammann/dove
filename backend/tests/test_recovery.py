@@ -2,23 +2,24 @@ import base64
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from svix.webhooks import Webhook
-from datetime import datetime, timezone
-from sqlalchemy import select
+from datetime import UTC, datetime
+
+from dove import providers, worker
+from dove.config import settings
 from dove.db import (
-    transaction,
-    SessionLocal,
     Record,
+    SessionLocal,
+    transaction,
     update,
 )
-from dove.config import settings
-from dove import worker, providers
-from test_workflow import create, detail, review, package, ok, AGREEMENT
+from sqlalchemy import select
+from svix.webhooks import Webhook
+from test_workflow import AGREEMENT, create, detail, ok, package, review
 
 
 def test_expired_send_intent_is_quarantined(clients, monkeypatch):
     c = clients[0]
-    work, contact, doc = create(c)
+    work, contact, _doc = create(c)
     wid = work["id"]
     review(c, wid, missing=True)
     po = next(r for r in detail(c, wid)["requirement"] if r["status"] == "missing")
@@ -46,7 +47,7 @@ def test_expired_send_intent_is_quarantined(clients, monkeypatch):
 
 def test_multiple_workers_cannot_duplicate_send(clients, monkeypatch):
     c = clients[0]
-    work, contact, doc = create(c)
+    work, contact, _doc = create(c)
     wid = work["id"]
     review(c, wid, missing=True)
     po = next(r for r in detail(c, wid)["requirement"] if r["status"] == "missing")
@@ -75,7 +76,7 @@ def test_multiple_workers_cannot_duplicate_send(clients, monkeypatch):
 
 def test_pause_and_reminder_limits(clients):
     c = clients[0]
-    work, contact, doc = create(c)
+    work, contact, _doc = create(c)
     wid = work["id"]
     review(c, wid, missing=True)
     po = next(r for r in detail(c, wid)["requirement"] if r["status"] == "missing")
@@ -107,7 +108,7 @@ def test_pause_and_reminder_limits(clients):
 
 def test_signed_webhook_persisted_and_deduplicated(clients):
     c = clients[0]
-    work, contact, doc = create(c)
+    work, contact, _doc = create(c)
     wid = work["id"]
     review(c, wid, missing=True)
     po = next(r for r in detail(c, wid)["requirement"] if r["status"] == "missing")
@@ -136,7 +137,7 @@ def test_signed_webhook_persisted_and_deduplicated(clients):
             },
         }
     )
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     event_id = "event-signed-test"
     signature = Webhook(secret).sign(event_id, now, payload)
     headers = {
@@ -159,9 +160,26 @@ def test_signed_webhook_persisted_and_deduplicated(clients):
         settings.resend_webhook_secret = original
 
 
+def test_signed_webhook_rejects_non_object_envelope(clients, monkeypatch):
+    secret = "whsec_" + base64.b64encode(b"test-secret-value-not-production").decode()
+    monkeypatch.setattr(settings, "resend_webhook_secret", secret)
+    payload = json.dumps(["not-an-object"])
+    now = datetime.now(UTC)
+    event_id = "event-invalid-envelope"
+    headers = {
+        "svix-id": event_id,
+        "svix-timestamp": str(int(now.timestamp())),
+        "svix-signature": Webhook(secret).sign(event_id, now, payload),
+        "content-type": "application/json",
+    }
+    response = clients[0].post("/api/webhooks/resend", content=payload, headers=headers)
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid webhook signature"
+
+
 def test_out_of_office_does_not_resolve_missing(clients):
     c = clients[0]
-    work, contact, doc = create(c)
+    work, contact, _doc = create(c)
     wid = work["id"]
     review(c, wid, missing=True)
     po = next(r for r in detail(c, wid)["requirement"] if r["status"] == "missing")
@@ -196,10 +214,11 @@ def test_out_of_office_does_not_resolve_missing(clients):
 
 def test_scanned_pdf_actionable_and_existing_invoice_immutable(clients):
     import io
+
     from reportlab.pdfgen import canvas
 
     c = clients[0]
-    work, contact, doc = create(
+    work, contact, _doc = create(
         c,
         AGREEMENT.replace(
             "Purchase order required before invoicing.",
@@ -259,14 +278,14 @@ def test_failed_model_calls_consume_budget(clients, monkeypatch):
         raise RuntimeError("Model not available")
 
     monkeypatch.setattr(providers, "analyze", fail)
-    work, contact, doc = create(c)
+    work, _contact, _doc = create(c)
     d = detail(c, work["id"])
     assert d["work"]["model_calls"] == 1 and d["job"][0]["attempts"] == 1
 
 
 def test_approved_package_recipient_change_blocks_delivery(clients):
     c = clients[0]
-    work, contact, doc = create(
+    work, contact, _doc = create(
         c,
         AGREEMENT.replace(
             "Purchase order required before invoicing.",
