@@ -10,6 +10,12 @@ envfile="$tmpdir/empty.env"
 cat > "$override" <<'YAML'
 services:
   db:
+    image: postgres:17.6-alpine
+    entrypoint: !reset null
+    command: !reset null
+    volumes: !override ["postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U dove -d dove"]
     ports: !reset []
   api:
     ports: !reset []

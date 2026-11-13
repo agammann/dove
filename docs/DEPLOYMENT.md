@@ -6,7 +6,7 @@ The [public website](https://dove-paperwork.alx21.chatgpt.site) is live on OpenA
 
 ## Chosen architecture
 
-One Ubuntu LTS VM (4 GB RAM, 2 vCPU minimum for a small pilot) running Docker Compose: Caddy HTTPS reverse proxy, FastAPI serving the compiled React app, PostgreSQL 17 and one durable worker. Database and object volumes stay private; in the production override, API and database ports are exposed only within the Compose network. Encrypted off-host backups are required. A Hetzner shared VM is the reference option; another Docker-capable host can use the same configuration. The pilot starts with a volume-backed private object store. No S3 account, public bucket or mandatory cloud service is created.
+One Ubuntu LTS VM (4 GB RAM, 2 vCPU minimum for a small pilot) running Docker Compose: Caddy HTTPS reverse proxy, FastAPI serving the compiled React app, PostgreSQL 18 and one durable worker. Database and object volumes stay private; in the production override, API and database ports are exposed only within the Compose network. Encrypted off-host backups are required. A Hetzner shared VM is the reference option; another Docker-capable host can use the same configuration. The pilot starts with a volume-backed private object store. No S3 account, public bucket or mandatory cloud service is created.
 
 This single-host design has downtime during maintenance and no automatic failover. It is a deliberate invitation-pilot operating assumption. Measure CPU/memory and model processing latency before increasing volume or concurrency.
 
@@ -25,7 +25,11 @@ Use the [first run guide](QUICKSTART.md) for local fixtures, ports, sample accou
 7. Start the stack, migrate once, check health, and issue a test invitation with the CLI. Do not seed samples in production. Run one authorized fictional document inference and email send/reply/attachment/delivery test to an explicitly authorized destination. Record provider IDs and outcomes without secrets.
 8. Configure encrypted off-host backups and expiration, restore one into isolation, apply a deletion ledger before any recovery worker starts, then run the release checklist.
 
-After configuring the approved host, DNS and secrets, use both Compose files for every production operation. In the Linux shell:
+This checkout's PostgreSQL 18 path is for confirmed fresh installations only. Inventory all prior databases, roles, object storage, hosts, projects, mounts, overrides and backups; the guard sees only this project's configured PostgreSQL and object volumes. Stop all possible writers and storage changes. Preserve any existing data and use an independently reviewed migration, including a consistent database-and-object backup and restore, rather than initializing a replacement. The published v1.0.0 archive still uses PostgreSQL 17.
+
+After configuring the approved host, DNS and secrets, and only after confirming that no Dove data exists, run `python scripts/confirm_postgres18_fresh.py production` from the repository root. The helper rejects inherited `COMPOSE_*`, `DOCKER_*`, `DATABASE_URL`, `PG*` and database/user selectors, rejects those selectors in `.env`, and rejects automatic Compose override files; unset or remove them for this step. Production secret-manager values, including `POSTGRES_PASSWORD` and `DOVE_DOMAIN`, may be supplied deliberately in the environment and take precedence over `.env`. The helper checks the resolved default storage mappings, URL-safe database password, matching API/worker settings, private ports, HTTPS origin and production provider configuration without displaying secrets. Review environment precedence without printing secrets, keep unreviewed selectors and overrides absent, and use the same approved values for initialization, startup and backups. The helper initializes only the database and object binding, not public services. If initialization is interrupted, preserve both volumes and inspect the mappings and logs; do not reset or forge markers. A matching cluster/object binding is not proof of backup completeness.
+
+Afterward, use both Compose files for every production operation. In the Linux shell:
 
 ~~~sh
 export COMPOSE_FILE=compose.yaml:compose.production.yaml
@@ -37,7 +41,7 @@ docker compose exec api python -c "import urllib.request; print(urllib.request.u
 
 Keep this `COMPOSE_FILE` setting in the deployment and backup environment. Running the base file alone starts the local topology. `config --quiet` validates configuration without printing resolved secret values. Check HTTPS health from outside the host too; internal health does not prove public routing or provider connectivity.
 
-For an existing PostgreSQL volume, changing the environment value alone does not rotate the database role's password. Back up first, stop the API and worker, change the role with `\password dove` in an interactive `docker compose exec db psql -U dove -d dove` session, then update the secret store and restart the stack. Keep the old and new values out of shell history and shared logs.
+For an existing PostgreSQL volume, changing the environment value alone does not rotate the database role's password. A PostgreSQL 17 installation must use its previous source and matching Compose mapping until separately migrated; this checkout refuses to start it. With the appropriate checkout and mapping, back up first, stop the API and worker, change the role with `\password dove` in an interactive `docker compose exec db psql -U dove -d dove` session, then update the secret store and restart the stack. Keep the old and new values out of shell history and shared logs.
 
 ## Limits and cost assumptions
 
@@ -61,7 +65,7 @@ python scripts/verify_restore.py /secure-backups/dove-YYYYMMDD
 
 On Linux, install Python 3.12 or newer for these scripts and retain the production Compose file setting above. The scripts invoke Docker Compose and inherit its environment.
 
-The verification script restores into a generated disposable database, extracts objects into a temporary directory, validates document and package hashes and ZIP integrity, never starts a worker, then drops only that generated database. It does not overwrite the live database. For disaster recovery, restore into a fresh stack first, review canceled/deleted work and uncertain deliveries, apply the deletion ledger, and keep automation paused until sign-off. Document measured recovery time and recovered record counts in the validation report.
+The verification script restores into a generated disposable database, extracts objects into a temporary directory, validates document and package hashes and ZIP integrity, never starts a worker, then drops only that generated database. It does not overwrite the live database. The sample backup dumps the `dove` database and object volume, not every database or cluster-wide role; inventory and separately back up any additional databases, roles and grants. The object archive contains `.dove-pg18-binding`: do not overwrite a recovery target's binding with the source archive's marker or fabricate markers to force startup. For disaster recovery or a major upgrade, restore a consistent database/object pair into an isolated stack with a separately reviewed binding and role/grant procedure. Review canceled/deleted work and uncertain deliveries, apply the deletion ledger, and keep automation paused until sign-off. An old PostgreSQL 17 cluster cannot consume PostgreSQL 18 writes; preserve a quiescent pre-upgrade backup and plan rollback and post-cutover writes explicitly. Document measured recovery time and recovered record counts in the validation report.
 
 ## Rollback and teardown
 

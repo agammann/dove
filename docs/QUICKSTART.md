@@ -6,7 +6,7 @@ Use fictional documents in local mode. Analysis and email are simulated; the pub
 
 ## Prerequisites
 
-Install Git and Docker with its Linux container engine. Start Docker, then confirm `docker version` shows a server and `docker compose version` succeeds. Use a current Compose plugin supporting `--wait`. Docker supplies Python, Node and pnpm; those tools are not required on the host for this route.
+Install Git, Python 3.12 or newer, and Docker with its Linux container engine. Start Docker, then confirm `docker version` shows a server and `docker compose version` succeeds. Use a current Compose plugin supporting `--wait`. Docker supplies Node and pnpm.
 
 ```sh
 git clone https://github.com/agammann/dove.git
@@ -43,6 +43,20 @@ PUBLIC_URL=http://127.0.0.1:8010
 If Windows reserves the PostgreSQL host port or another service uses it, set `DOVE_DB_PORT` to an available loopback port in that `.env`, for example `DOVE_DB_PORT=55429`. You do not need to edit Compose or change `DATABASE_URL`: containers still connect to `db:5432`.
 
 Keep `ENVIRONMENT=local`, `MODEL_ADAPTER=fixture`, and `EMAIL_ADAPTER=local`. Review an existing `.env` before editing it. Always open exactly `PUBLIC_URL`: `localhost` and `127.0.0.1` are different origins.
+
+## Initialize a fresh database
+
+These instructions apply to this checkout; the published v1.0.0 archive uses PostgreSQL 17. Before initializing, inventory all previous Dove databases, additional databases and roles, object storage, Docker hosts, Compose project names, volume or bind-mount mappings, overrides and backups. The guard can inspect only the selected project's `postgres` and `objects` mounts. It cannot discover other projects, external volumes, bind mounts, remote databases or other hosts. Stop every potential writer and storage change during the inspection and initialization. If any existing Dove data may be present, preserve its original source, mapping and backups and plan a separately reviewed migration; a fresh database is not a migration.
+
+Only after confirming no Dove data exists, run this from the repository root and type the exact requested phrase:
+
+```sh
+python scripts/confirm_postgres18_fresh.py local
+```
+
+Use a clean shell for initialization: the helper rejects inherited Compose/Docker selectors, `DATABASE_URL`, `PG*`, `POSTGRES_PASSWORD` and Dove/application settings that could override the generated `.env`. It also rejects selectors such as `COMPOSE_FILE`, `PGDATA` and `DATABASE_URL` inside `.env`, and automatic `compose.override.*`/`docker-compose.override.*` files; keep its intended password and local settings in `.env`. It validates the resolved default volume mappings, URL-safe database password, matching API/worker credentials, loopback ports and local fixture settings without displaying secrets. Docker Compose otherwise gives shell variables precedence and can load overrides automatically, so keep selectors and override files absent and use the same reviewed configuration for later startup and backup commands.
+
+The helper checks for existing project containers; the guard requires empty legacy PostgreSQL, new PostgreSQL and object volumes. It writes a permanent attempt record and binds the new cluster and object volume. Normal startup checks both identities. Those markers detect mismatched volumes; they do not prove a backup is complete or detect external storage. If initialization is interrupted, preserve all volumes and inspect the logs and mappings; do not reset a volume, forge a marker or retry fresh initialization. If initialization completed before the helper switched to normal startup, `docker compose up --detach --wait db` checks the binding. Other failures require an installation-specific recovery.
 
 ## Start and check health
 
@@ -84,7 +98,7 @@ Local completion means simulated provider acceptance, not real email delivery or
 
 `docker compose down` stops the stack and retains database/object volumes. Resume with the startup command. Do not add `--volumes` if retaining data.
 
-If you used an older sample database volume with the repository's former shared password, first back up any work you need to retain. Generate `.env` as above, run `docker compose stop api worker`, then start only the database with `docker compose up --detach --wait db`. Open `docker compose exec db psql -U dove -d dove` and run `\password dove`; enter the new value from your private `.env` twice at the prompts, then `\q`. Start the full stack. Changing `.env` alone does not change a password already stored in a PostgreSQL volume. Do not remove the volume to rotate credentials.
+If you used an older PostgreSQL 17 sample volume with the former shared password, preserve its actual checkout and matching Compose mapping until a separately reviewed migration. First back up any work and matching object data you need to retain. The last pre-PG18 checkout (`ebc675ca42bdeb55b55648dd79ecd5db2c517b2a`) includes the configuration helper and the tested rotation procedure; the published v1.0.0 archive does not include that helper. Do not silently substitute a different checkout or assume those commands exist: use a reviewed procedure for the installed version and its actual mappings. Changing an environment value alone does not change a password already stored in a PostgreSQL volume. Do not remove the volume to rotate credentials.
 
 To deliberately delete and recreate only the three fictional sample workspaces, use `docker compose exec api python -m dove.cli reset-samples`. It refuses production mode and non-sample organizations. This is not a networking repair command.
 
