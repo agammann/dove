@@ -50,7 +50,7 @@ jobs:
         working-directory: sites
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
           cache: npm
@@ -94,10 +94,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '24.19.0'
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.12'
       - name: Package and verify exact source ZIP
@@ -149,6 +149,48 @@ jobs:
           name: dove-release
           path: release-artifacts/
           if-no-files-found: error
+      - name: Download the uploaded source archive
+        id: archive-download-first
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dove-release
+          path: ${{ runner.temp }}/dove-release-roundtrip
+      - name: Wait for artifact visibility
+        if: steps.archive-download-first.outcome == 'failure'
+        run: Start-Sleep -Seconds 10
+      - name: Retry source archive download
+        id: archive-download-second
+        if: steps.archive-download-first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dove-release
+          path: ${{ runner.temp }}/dove-release-roundtrip
+      - name: Wait for artifact visibility again
+        if: steps.archive-download-second.outcome == 'failure'
+        run: Start-Sleep -Seconds 20
+      - name: Final source archive download attempt
+        if: steps.archive-download-second.outcome == 'failure'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dove-release
+          path: ${{ runner.temp }}/dove-release-roundtrip
+      - name: Verify downloaded archive hash
+        run: ./scripts/verify-roundtrip.ps1 -Directory (Join-Path $env:RUNNER_TEMP 'dove-release-roundtrip')
+      - name: Reject a corrupted source archive
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'dove-release-corrupt-fixture'
+          New-Item -ItemType Directory -Path $dir -Force | Out-Null
+          Set-Content -LiteralPath (Join-Path $dir 'dove_1.0.0_source.zip') -Value 'fixture'
+          Set-Content -LiteralPath (Join-Path $dir 'SHA256SUMS') -Value (('0' * 64) + '  dove_1.0.0_source.zip')
+          try {
+            ./scripts/verify-roundtrip.ps1 -Directory $dir
+          } catch {
+            if ($_.Exception.Message -notmatch 'hash mismatch') { throw }
+            exit 0
+          }
+          throw 'Corrupt archive unexpectedly passed verification.'
       - name: Collect consumer verification inside the checkout
         if: always()
         run: |
@@ -175,12 +217,45 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dove-release
           path: release-artifacts/
-      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const {default: publish} = await import(process.env.GITHUB_WORKSPACE + '/scripts/release.mjs');
             await publish({github, context, core});
+
+  retry-guard-test:
+    name: Verify artifact failure guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Missing artifact attempt one
+        id: first
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt two
+        id: second
+        if: steps.first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt three
+        id: third
+        if: steps.second.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Require all missing-artifact attempts to fail
+        if: always()
+        env:
+          FIRST: ${{ steps.first.outcome }}
+          SECOND: ${{ steps.second.outcome }}
+          THIRD: ${{ steps.third.outcome }}
+        run: test "$FIRST" = failure && test "$SECOND" = failure && test "$THIRD" = failure

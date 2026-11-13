@@ -35,7 +35,7 @@
     "react": "19.3.0",
     "react-day-picker": "^10.0.1",
     "react-dom": "19.3.0",
-    "react-hook-form": "^7.85.0",
+    "react-hook-form": "^7.91.0",
     "react-resizable-panels": "^4.12.2",
     "recharts": "^3.8.0",
     "sonner": "^2.0.8",
@@ -51,8 +51,8 @@
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.2",
-    "drizzle-kit": "0.31.10",
+    "@vitejs/plugin-react": "6.3.0",
+    "drizzle-kit": "0.31.11",
     "esbuild": "0.28.1",
     "eslint": "9.39.4",
     "playwright": "1.62.1",
@@ -66,7 +66,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "globals": "16.4.0",
-    "typescript-eslint": "8.59.3"
+    "typescript-eslint": "8.72.1"
   },
   "type": "module",
   "overrides": {
