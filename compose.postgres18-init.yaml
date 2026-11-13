@@ -1,0 +1,5 @@
+services:
+  db:
+    entrypoint: ["sh", "/dove/postgres18-guard.sh", "initialize"]
+    environment:
+      DOVE_PG18_FRESH_INSTALL: ${DOVE_PG18_FRESH_INSTALL:?Confirm this is a fresh installation as documented}

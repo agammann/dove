@@ -1,16 +1,22 @@
 name: dove
 services:
   db:
-    image: postgres:17.6-alpine
+    image: postgres:18.4-alpine
+    entrypoint: ["sh", "/dove/postgres18-guard.sh", "start"]
+    command: ["postgres"]
     restart: unless-stopped
     environment:
       POSTGRES_DB: dove
       POSTGRES_USER: dove
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup_env.py or set a unique database password}
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres:/dove/legacy:ro
+      - postgres18:/var/lib/postgresql
+      - objects:/dove/objects
+      - ./deploy/postgres18-guard.sh:/dove/postgres18-guard.sh:ro
+      - ./deploy/postgres18-ready.sh:/docker-entrypoint-initdb.d/zz-dove-ready.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dove -d dove"]
+      test: ["CMD-SHELL", "test -f /var/lib/postgresql/18/docker/.dove-init-complete && pg_isready -h 127.0.0.1 -U dove -d dove"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -60,4 +66,5 @@ services:
     restart: unless-stopped
 volumes:
   postgres:
+  postgres18:
   objects:

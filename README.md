@@ -34,12 +34,15 @@ The Python sample below remains a separate implementation with its own accounts 
 
 ## Run the local Python sample
 
-Install Git and Docker with the Linux engine and a current Docker Compose plugin. Docker supplies Python, Node and the application dependencies.
+Install Git, Python 3.12 or newer, and Docker with the Linux engine and a current Docker Compose plugin. Docker supplies Node and the application dependencies.
+
+This checkout initializes PostgreSQL 18 only for a confirmed fresh sample. Before proceeding, inventory any previous Dove databases and object storage; see the [first run guide](docs/QUICKSTART.md#initialize-a-fresh-database). The published v1.0.0 archive uses PostgreSQL 17.
 
 ```sh
 git clone https://github.com/agammann/dove.git
 cd dove
 docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace python:3.12.11-slim python scripts/setup_env.py
+python scripts/confirm_postgres18_fresh.py local
 docker compose up --build --detach --wait --wait-timeout 180
 docker compose exec api python -m dove.cli seed
 ```

@@ -59,9 +59,16 @@ jobs:
       - name: Generate unique local database credentials
         run: |
           python3 -m unittest scripts/test_setup_env.py
+          python3 -m unittest scripts/test_confirm_postgres18_fresh.py
           python3 scripts/setup_env.py
       - name: Verify retained PostgreSQL credential rotation
         run: bash scripts/test_legacy_db_migration.sh
+      - name: Exercise fresh PostgreSQL and object-store guards
+        run: python scripts/test_postgres18_guard.py
+      - name: Initialize the disposable PostgreSQL 18 sample
+        env:
+          DOVE_PG18_FRESH_INSTALL: confirmed-no-existing-dove-data
+        run: docker compose -f compose.yaml -f compose.postgres18-init.yaml up --detach --wait --wait-timeout 180 db
       - name: Start documented Docker sample
         run: docker compose up --build --detach --wait --wait-timeout 180
       - name: Verify SQLite and disposable PostgreSQL databases
@@ -75,8 +82,11 @@ jobs:
           curl --fail http://127.0.0.1:8000/api/health
           curl --fail http://127.0.0.1:8000/ > /tmp/dove-index.html
           test "$(docker compose exec -T api id -u)" = 10001
+          docker compose exec -T -e DOVE_SYNTHETIC_BACKUP_FIXTURE=isolated-ci-only api python - < scripts/ci_seed_backup_fixture.py
           python scripts/backup.py --output /tmp/dove-backup
-          python scripts/verify_restore.py /tmp/dove-backup
+          result=$(python scripts/verify_restore.py /tmp/dove-backup)
+          printf '%s\n' "$result"
+          printf '%s' "$result" | python3 -c 'import json,sys; assert json.load(sys.stdin)["objects_verified"] >= 1'
       - name: Show container logs on failure
         if: failure()
         run: docker compose logs --no-color

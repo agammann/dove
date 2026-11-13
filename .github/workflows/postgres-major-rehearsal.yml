@@ -7,6 +7,13 @@ on:
       - 'backend/**'
       - 'frontend/**'
       - 'scripts/test_postgres_major_upgrade.sh'
+      - 'scripts/test_postgres18_guard.py'
+      - 'scripts/confirm_postgres18_fresh.py'
+      - 'deploy/postgres18-guard.sh'
+      - 'deploy/postgres18-ready.sh'
+      - 'compose.yaml'
+      - 'compose.production.yaml'
+      - 'compose.postgres18-init.yaml'
       - '.github/workflows/postgres-major-rehearsal.yml'
   workflow_dispatch:
 permissions:
