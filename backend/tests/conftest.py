@@ -11,10 +11,10 @@ os.environ["DATABASE_URL"] = os.environ.get(
     "sqlite:///" + str(Path(tempfile.mkdtemp(prefix="dove-test-db-")) / "test.db"),
 )
 import pytest
-from fastapi.testclient import TestClient
-from dove.db import Base, engine, transaction, Organization, User
 from dove.auth import passwords
+from dove.db import Base, Organization, User, engine, transaction
 from dove.main import app
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture(autouse=True)

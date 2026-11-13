@@ -1,12 +1,13 @@
 import io
 import subprocess
-from concurrent.futures import ThreadPoolExecutor
 import threading
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
-from reportlab.pdfgen import canvas
-from dove.config import settings
 from dove import pdf_process, worker
-from test_workflow import create, detail, review, package, ok, AGREEMENT
+from dove.config import settings
+from reportlab.pdfgen import canvas
+from test_workflow import AGREEMENT, create, detail, ok, package, review
 
 
 def ready(c):

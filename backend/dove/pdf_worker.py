@@ -65,7 +65,7 @@ if __name__ == "__main__":
         main()
     except ValueError as exc:
         sys.stdout.write(json.dumps({"error": str(exc)}))
-    except Exception:
+    except Exception:  # noqa: BLE001 - prevent worker internals from leaking in the response
         sys.stdout.write(
             json.dumps(
                 {

@@ -1,10 +1,12 @@
 import hashlib
 import secrets
 import time
-from fastapi import Request, HTTPException
+
+from fastapi import HTTPException, Request
 from pwdlib import PasswordHash
 from sqlalchemy import select
-from .db import SessionLocal, Session, User, Record, add, transaction
+
+from .db import Record, Session, SessionLocal, User, add, transaction
 
 passwords = PasswordHash.recommended()
 dummy_hash = passwords.hash(secrets.token_urlsafe(32))

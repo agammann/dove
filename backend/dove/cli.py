@@ -2,21 +2,23 @@ import argparse
 import json
 import secrets
 import time
-from sqlalchemy import select, delete
+
+from sqlalchemy import delete, select
+
+from . import workflow as w
+from .auth import passwords, token_hash
 from .config import settings
 from .db import (
-    Organization,
-    User,
     Invitation,
+    Organization,
     Record,
     Session,
     SessionLocal,
-    transaction,
+    User,
     add,
     records,
+    transaction,
 )
-from .auth import token_hash, passwords
-from . import workflow as w
 
 SAMPLES = [
     (
@@ -146,7 +148,7 @@ def seed(reset=False):
 
 
 def invite(org_name, email):
-    from pydantic import TypeAdapter, EmailStr
+    from pydantic import EmailStr, TypeAdapter
 
     email = str(TypeAdapter(EmailStr).validate_python(email)).lower()
     token = secrets.token_urlsafe(32)

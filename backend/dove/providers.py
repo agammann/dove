@@ -2,9 +2,11 @@
 
 import base64
 import re
+
 import httpx
+
 from .config import settings
-from .schemas import Analysis, RequestDraft, ReplyInterpretation
+from .schemas import Analysis, ReplyInterpretation, RequestDraft
 
 
 class UncertainSend(Exception):
@@ -17,6 +19,7 @@ class RejectedSend(Exception):
 
 def structured_task(instruction, payload, schema):
     import json
+
     from openai import OpenAI
 
     if settings.model_adapter != "openai" or not settings.openai_api_key:
@@ -82,7 +85,7 @@ def interpret_reply(text, requirements):
                 "deliverable": r"deliver|checklist",
                 "billing_recipient": r"bill|invoice",
             }
-            if re.search(markers.get(r["category"], re.escape(r["title"])), text, re.I):
+            if re.search(markers.get(r["category"], re.escape(r["title"])), text, re.IGNORECASE):
                 associations.append({"requirement_id": r["id"], "excerpt": text[:1500]})
         return ReplyInterpretation(
             classification="relevant" if associations else "ambiguous",
@@ -123,14 +126,14 @@ def fixture_analysis(documents):
         for page_no, page in enumerate(doc["pages"], 1):
             for line in page.splitlines():
                 for category, title, pattern in patterns:
-                    match = re.search(pattern, line, re.I)
+                    match = re.search(pattern, line, re.IGNORECASE)
                     if not match:
                         continue
                     missing = bool(
                         re.search(
                             r"\brequired\b|must|shall|missing|needed|before invoic",
                             line,
-                            re.I,
+                            re.IGNORECASE,
                         )
                     )
                     value = ""
@@ -169,6 +172,7 @@ def analyze(documents):
     if settings.model_adapter != "openai" or not settings.openai_api_key:
         raise RuntimeError("Model credentials are not configured")
     import json
+
     from openai import OpenAI
 
     client = OpenAI(api_key=settings.openai_api_key, timeout=45, max_retries=0)

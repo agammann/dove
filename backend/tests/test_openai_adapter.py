@@ -5,10 +5,9 @@ import json
 import httpx
 import openai
 import pytest
-from pydantic import ValidationError
-
 from dove import providers
 from dove.config import settings
+from pydantic import ValidationError
 
 
 def mock_client(monkeypatch, content):

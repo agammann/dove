@@ -7,18 +7,21 @@ retry at most three times. PostgreSQL org-row locks serialize mutations.
 import io
 import time
 import zipfile
+
 from sqlalchemy import select
+
+from . import providers, storage
+from . import workflow as w
 from .config import settings
 from .db import (
-    SessionLocal,
-    Record,
     Organization,
-    transaction,
-    records,
+    Record,
+    SessionLocal,
     get,
+    records,
+    transaction,
     update,
 )
-from . import workflow as w, providers, storage
 
 
 def tick(limit=20):
@@ -204,7 +207,7 @@ def process_job(org_id, jid):
                     raise ValueError("Unknown job type")
         with transaction(org_id) as db:
             update(get(db, org_id, jid, "job"), status="complete", error=None)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - record unexpected job failures for bounded retry
         with transaction(org_id) as db:
             job = get(db, org_id, jid, "job")
             error = getattr(exc, "detail", None) or (
@@ -289,7 +292,7 @@ def send_job(org_id, jid):
         result = {}
         status = "failed"
         error = str(exc)
-    except Exception:
+    except Exception:  # noqa: BLE001 - unknown send outcomes must not be retried automatically
         result = {}
         status = "uncertain"
         error = "Provider acceptance is unknown. Reconcile this attempt; Dove will not automatically resend."
@@ -346,7 +349,7 @@ def main():
     while True:
         try:
             tick()
-        except Exception:
+        except Exception:  # noqa: BLE001 - keep the worker running without logging private payloads
             # Ordinary logs deliberately exclude user documents and provider payloads.
             print(
                 "Worker tick failed; inspect health and scoped job failures.",
