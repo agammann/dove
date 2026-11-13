@@ -54,6 +54,8 @@ Only after confirming no Dove data exists, run this from the repository root and
 python scripts/confirm_postgres18_fresh.py local
 ```
 
+Use a clean shell for initialization: the helper rejects inherited Compose/Docker selectors, `DATABASE_URL`, `PG*`, `POSTGRES_PASSWORD` and Dove/application settings that could override the generated `.env`. It also rejects selectors such as `COMPOSE_FILE`, `PGDATA` and `DATABASE_URL` inside `.env`; keep its intended password and local settings there. It validates the resolved default volume mappings, URL-safe database password, matching API/worker credentials, loopback ports and local fixture settings without displaying secrets. Docker Compose otherwise gives shell variables precedence, so keep the same reviewed configuration for later startup and backup commands.
+
 The helper checks for existing project containers; the guard requires empty legacy PostgreSQL, new PostgreSQL and object volumes. It writes a permanent attempt record and binds the new cluster and object volume. Normal startup checks both identities. Those markers detect mismatched volumes; they do not prove a backup is complete or detect external storage. If initialization is interrupted, preserve all volumes and inspect the logs and mappings; do not reset a volume, forge a marker or retry fresh initialization. If initialization completed before the helper switched to normal startup, `docker compose up --detach --wait db` checks the binding. Other failures require an installation-specific recovery.
 
 ## Start and check health

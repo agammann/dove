@@ -61,6 +61,10 @@ jobs:
           python3 -m unittest scripts/test_setup_env.py
           python3 -m unittest scripts/test_confirm_postgres18_fresh.py
           python3 scripts/setup_env.py
+      - name: Validate actual resolved Compose preflight
+        run: |
+          docker compose -p dove -f compose.yaml config --format json | python3 -c 'import json,sys; from scripts.confirm_postgres18_fresh import validate_config; validate_config(json.load(sys.stdin), "local")'
+          env ENVIRONMENT=production PUBLIC_URL=https://fixture.invalid DOVE_DOMAIN=fixture.invalid MODEL_ADAPTER=openai EMAIL_ADAPTER=resend SECRET_KEY=synthetic-secret-0123456789-0123456789-0123456789 OPENAI_API_KEY=synthetic RESEND_API_KEY=synthetic RESEND_WEBHOOK_SECRET=synthetic EMAIL_FROM=fixture@example.invalid REPLY_DOMAIN=reply.fixture.invalid docker compose -p dove -f compose.yaml -f compose.production.yaml config --format json | python3 -c 'import json,sys; from scripts.confirm_postgres18_fresh import validate_config; validate_config(json.load(sys.stdin), "production")'
       - name: Verify retained PostgreSQL credential rotation
         run: bash scripts/test_legacy_db_migration.sh
       - name: Exercise fresh PostgreSQL and object-store guards
