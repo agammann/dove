@@ -28,7 +28,7 @@ If that database already exists, confirm it is disposable before testing. The te
 
 ## Native development
 
-Use Python 3.12, Node 22 and pnpm 10.16.1. Docker is the supported full workflow and provides Linux PDF resource limits. Run native development in a clean terminal without production environment variables.
+Use Python 3.12, Node 22 and pnpm 10.16.1 for native development. The application Docker image uses Python 3.15. Docker is the supported full workflow and provides Linux PDF resource limits. Run native development in a clean terminal without production environment variables.
 
 From `frontend/`:
 

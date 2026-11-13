@@ -247,10 +247,10 @@
   {
     "ecosystem": "Python",
     "name": "jiter",
-    "version": "0.16.0",
+    "version": "0.19.0",
     "license": "MIT",
     "notices": [
-      "jiter_0.16.0__jiter_0.16.0.dist_info_licenses_LICENSE"
+      "jiter_0.19.0__jiter_0.19.0.dist_info_licenses_LICENSE"
     ]
   },
   {
@@ -265,10 +265,10 @@
   {
     "ecosystem": "Python",
     "name": "MarkupSafe",
-    "version": "3.0.3",
+    "version": "3.0.4",
     "license": "BSD-3-Clause",
     "notices": [
-      "MarkupSafe_3.0.3__markupsafe_3.0.3.dist_info_licenses_LICENSE.txt"
+      "MarkupSafe_3.0.4__markupsafe_3.0.4.dist_info_licenses_LICENSE.txt"
     ]
   },
   {
@@ -375,19 +375,19 @@
   {
     "ecosystem": "Python",
     "name": "pydantic",
-    "version": "2.13.5",
+    "version": "2.14.3",
     "license": "MIT",
     "notices": [
-      "pydantic_2.13.5__pydantic_2.13.5.dist_info_licenses_LICENSE"
+      "pydantic_2.14.3__pydantic_2.14.3.dist_info_licenses_LICENSE"
     ]
   },
   {
     "ecosystem": "Python",
     "name": "pydantic_core",
-    "version": "2.46.5",
+    "version": "2.50.4",
     "license": "MIT",
     "notices": [
-      "pydantic_core_2.46.5__pydantic_core_2.46.5.dist_info_licenses_LICENSE"
+      "pydantic_core_2.50.4__pydantic_core_2.50.4.dist_info_licenses_LICENSE"
     ]
   },
   {
