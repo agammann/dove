@@ -2673,10 +2673,31 @@
   {
     "ecosystem": "npm",
     "name": "typescript",
-    "version": "5.9.2",
+    "version": "7.0.2",
     "license": "Apache-2.0",
     "notices": [
-      "typescript_5.9.2__LICENSE.txt"
+      "typescript_7.0.2__LICENSE",
+      "typescript_7.0.2__NOTICE.txt"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@typescript/typescript-win32-x64",
+    "version": "7.0.2",
+    "license": "Apache-2.0",
+    "notices": [
+      "_typescript_typescript_win32_x64_7.0.2__LICENSE",
+      "_typescript_typescript_win32_x64_7.0.2__NOTICE.txt"
+    ]
+  },
+  {
+    "ecosystem": "npm",
+    "name": "@typescript/typescript-linux-x64",
+    "version": "7.0.2",
+    "license": "Apache-2.0",
+    "notices": [
+      "_typescript_typescript_linux_x64_7.0.2__LICENSE",
+      "_typescript_typescript_linux_x64_7.0.2__NOTICE.txt"
     ]
   },
   {
