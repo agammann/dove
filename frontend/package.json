@@ -2,6 +2,9 @@
   "name": "dove",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "^22.20.0 || ^24.12.0 || >=25.0.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -20,7 +23,7 @@
     "@vitejs/plugin-react": "5.2.0",
     "prettier": "3.9.10",
     "typescript": "7.0.2",
-    "vite": "6.4.5"
+    "vite": "6.4.6"
   },
   "license": "MIT"
 }

@@ -139,7 +139,7 @@ const publish = async ({ github, context, core }) => {
   const notes = changelog.split(heading)[1].split("\n## ")[0].trim();
   const body =
     notes +
-    "\n\nDownload the source ZIP, verify SHA256SUMS, extract it, enter sites/, and run npm ci followed by npm run dev. Node.js 22.13 or newer is required. Browser v1 needs no account; model-free manual review and packaging need no API key. Optional hosted analysis uses the visitor key and billing account. Export a complete workspace backup before upgrading; local saved work does not sync automatically. The separate Python sample uses simulated adapters by default.\n\n" +
+    "\n\nDownload the source ZIP, verify SHA256SUMS, extract it, enter sites/, and run npm ci followed by npm run dev. Supported Node.js versions are 22.13 or newer in 22.x, or 24 and newer. Browser v1 needs no account; model-free manual review and packaging need no API key. Optional hosted analysis uses the visitor key and billing account. Export a complete workspace backup before upgrading; local saved work does not sync automatically. The separate Python sample uses simulated adapters by default.\n\n" +
     "[Installation, upgrade and recovery](https://github.com/" +
     owner +
     "/" +

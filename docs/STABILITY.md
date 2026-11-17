@@ -1,4 +1,4 @@
-# Dove v1
+# Dove browser v1 — source release 2.0.0
 
 The v1 product is the browser workspace in `sites/`: readable PDF/TXT uploads, source-linked requirements, human review, request drafts and verified reply records, invoice/package downloads, exact version approval, and complete local backup restoration. Device analysis and visitor-funded OpenAI analysis are optional. Manual review and packaging work without either model. The landing page's native WebMCP tool changes an illustration only.
 
@@ -6,9 +6,9 @@ Records belong to one browser profile and full site origin. There is no automati
 
 ## Install and build
 
-Use Node.js 22.13 or newer and npm. Extract the release ZIP or check out its tag. In `sites/`, run `npm ci`, then `npm run dev`; open `http://127.0.0.1:5173/workspace/`. For a compiled preview, run `npm run build` and `npm start`. Entering a different port creates a separate local workspace.
+Use Node.js 22.13 or newer in 22.x, or 24 and newer and npm. Extract the release ZIP or check out its tag. In `sites/`, run `npm ci`, then `npm run dev`; open `http://127.0.0.1:5173/workspace/`. For a compiled preview, run `npm run build` and `npm start`. Entering a different port creates a separate local workspace.
 
-The repository also includes a separate Python/PostgreSQL example. Its documented Docker setup and fixture tests are supported as an example; browser v1 does not certify its real email, live model provider or customer hosting. Preserve both implementations and their dependency locks.
+Source release 2.0.0 includes a separate Python/PostgreSQL example with a breaking installation boundary: PostgreSQL 18 initialization is fresh-only. Preserve an existing PostgreSQL 17 installation and its matching object storage; no general existing-data migration is provided. The archived 1.0.0 source uses PostgreSQL 17. Its documented Docker setup and fixture tests are supported as an example; browser v1 does not certify its real email, live model provider or customer hosting. Preserve both implementations and their dependency locks.
 
 ## Upgrade
 

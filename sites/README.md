@@ -56,7 +56,7 @@ Cancellation preserves the previous checklist, but usage already incurred can st
 
 ## Local development
 
-Requires Node.js 22.13+ and npm. Development, builds, fixture tests and device/manual workflows require no API key, account, local database initialization or invitation. Real hosted inference requires a visitor-supplied key.
+Requires Node.js 22.13+ in 22.x, or 24 and newer, and npm. Development, builds, fixture tests and device/manual workflows require no API key, account, local database initialization or invitation. Real hosted inference requires a visitor-supplied key.
 
 The browser app uses React and Vite. Builds pre-render the landing page and the workspace's initial loading view, then hydrate their existing React components. A Cloudflare Worker serves those pages and delegates hosted analysis to the visitor-key handler. The storage and backup formats are unchanged.
 

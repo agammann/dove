@@ -1,6 +1,6 @@
 # First run
 
-[Back to Dove](../README.md) Â· [Documentation](README.md)
+[Back to Dove](../README.md) · [Documentation](README.md)
 
 Use fictional documents in local mode. Analysis and email are simulated; the public website is a separate service.
 

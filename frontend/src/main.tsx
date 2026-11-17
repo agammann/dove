@@ -376,7 +376,7 @@ function Landing({
         <div>
           <h2>Let’s finish the paperwork.</h2>
           <p>
-            Invitation beta for businesses with missing purchase orders,
+            Invitation-based access for businesses with missing purchase orders,
             acceptance evidence, or approved deliverables.
           </p>
           <p>Access requests are reviewed manually. No payment is collected.</p>

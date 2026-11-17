@@ -2,7 +2,7 @@
 
 For the published ChatGPT Sites workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
-The [public website](https://dove-paperwork.alx21.chatgpt.site) is live on OpenAI Sites. The full document workspace in this repository still requires its own deployment. Live provider validation and the [release checklist](RELEASE-CHECKLIST.md) must pass before customer onboarding.
+The [public website](https://dove-paperwork.alx21.chatgpt.site) is live on OpenAI Sites. The separate Python application in this repository requires its own deployment; the public browser document workspace is already available at the same site. Live provider validation and the [release checklist](RELEASE-CHECKLIST.md) must pass before customer onboarding.
 
 ## Chosen architecture
 
@@ -49,10 +49,10 @@ Per document: 8 MB, 50 PDF pages, 100,000 extracted characters. Per analysis inp
 
 Cost planning, checked against official sources on 2026-09-08:
 
-- GPT-4.1 mini: $0.40 per million input tokens and $1.60 per million output tokens. At 100 work items/month Ã— three analyses Ã— 8,000 input and 1,000 output tokens, modeled inference is **$1.44/month**. Large documents/retries can raise this; it is not measured pilot cost. [Official model pricing](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
-- Resend lists 3,000 emails/month with a 100/day limit on Free, or $20/month for 50,000 emails on Pro; verify sending/receiving quotas and overages for the selected account before launch. Budget $0â€“$20/month for this small pilot, with no guarantee a free tier fits. [Official Resend pricing](https://resend.com/pricing/).
-- Budget approximately â‚¬6â€“â‚¬15/month for a small shared VM, plus an explicit allowance for encrypted off-host backups, storage growth, domain renewal and applicable taxes. Region/currency/IP options change the exact quote; inspect it at provisioning time. [Official Hetzner pricing changes](https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/).
-- Plan roughly **$15â€“$45/month equivalent before labor** as an initial operating allowance, not a provider quote or validated unit-economics claim. Track operator support/onboarding time separately; it will likely dominate a three-business pilot.
+- GPT-4.1 mini: $0.40 per million input tokens and $1.60 per million output tokens. At 100 work items/month × three analyses × 8,000 input and 1,000 output tokens, modeled inference is **$1.44/month**. Large documents/retries can raise this; it is not measured pilot cost. [Official model pricing](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+- Resend lists 3,000 emails/month with a 100/day limit on Free, or $20/month for 50,000 emails on Pro; verify sending/receiving quotas and overages for the selected account before launch. Budget $0–$20/month for this small pilot, with no guarantee a free tier fits. [Official Resend pricing](https://resend.com/pricing/).
+- Budget approximately €6–€15/month for a small shared VM, plus an explicit allowance for encrypted off-host backups, storage growth, domain renewal and applicable taxes. Region/currency/IP options change the exact quote; inspect it at provisioning time. [Official Hetzner pricing changes](https://docs.hetzner.com/general/infrastructure-and-availability/price-adjustment/).
+- Plan roughly **$15–$45/month equivalent before labor** as an initial operating allowance, not a provider quote or validated unit-economics claim. Track operator support/onboarding time separately; it will likely dominate a three-business pilot.
 
 ## Backup and restoration
 
