@@ -12,9 +12,9 @@ Dove helps service businesses gather missing purchase orders, review acceptance 
 
 Follow the [browser quickstart](docs/BROWSER-QUICKSTART.md) to upload the included examples, review a checklist manually, generate an invoice, approve the exact package and restore a complete backup. The walkthrough needs no model or API key.
 
-For development, enter `sites/`, run `npm ci` and `npm run dev`, then open `http://127.0.0.1:5173/workspace/`. Node.js 22.13 or newer is required. See [browser development](sites/README.md#local-development) for builds and checks.
+For development, enter `sites/`, run `npm ci` and `npm run dev`, then open `http://127.0.0.1:5173/workspace/`. Node.js 22.13 or newer in 22.x, or 24 and newer is required. See [browser development](sites/README.md#local-development) for builds and checks.
 
-Download the v1 source ZIP from [Releases](https://github.com/agammann/dove/releases), verify `SHA256SUMS`, and extract it before using those commands. The ZIP includes both the browser workspace and separate Docker sample.
+Download the [2.0.0 source ZIP](https://github.com/agammann/dove/releases/tag/v2.0.0), verify `SHA256SUMS`, and extract it before using those commands. The ZIP includes both the browser workspace and separate Docker sample; browser saved-work and backup format 1 are retained.
 
 ## What is available
 
@@ -36,7 +36,7 @@ The Python sample below remains a separate implementation with its own accounts 
 
 Install Git, Python 3.12 or newer, and Docker with the Linux engine and a current Docker Compose plugin. Docker supplies Node and the application dependencies.
 
-This checkout initializes PostgreSQL 18 only for a confirmed fresh sample. Before proceeding, inventory any previous Dove databases and object storage; see the [first run guide](docs/QUICKSTART.md#initialize-a-fresh-database). The published v1.0.0 archive uses PostgreSQL 17.
+Source release 2.0.0 initializes PostgreSQL 18 only for a confirmed fresh sample. This is an installation compatibility break from the archived 1.0.0 Python sample; browser saved-work and backup format 1 remain unchanged. Before proceeding, inventory any previous Dove databases and object storage; see the [first run guide](docs/QUICKSTART.md#initialize-a-fresh-database). The published v1.0.0 archive uses PostgreSQL 17.
 
 ```sh
 git clone https://github.com/agammann/dove.git

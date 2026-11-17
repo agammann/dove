@@ -1,6 +1,6 @@
 # Data handling and retention
 
-This document describes the separate Python application. The published no-login browser workspace uses local storage and no paid AI API; see [browser workspace](HOSTED-WORKSPACE.md).
+This document describes the separate Python application. The published no-login browser workspace stores work locally and offers model-free manual review, device analysis, and optional paid analysis with the visitor's OpenAI key; see [browser workspace](HOSTED-WORKSPACE.md).
 
 This is an implementation description, not a compliance certification or a promise of confidentiality beyond the configured deployment.
 
@@ -22,7 +22,7 @@ This is an implementation description, not a compliance certification or a promi
 
 Local sample mode uses fictional `.example` addresses, deterministic extraction fixtures and a database outbox. Sample seed/reset refuses production mode or live adapters. Sample organizations are separate from real organizations. Do not use the shared sample password in production; the production runtime disallows fixture adapters.
 
-## Operational policy for invitation beta
+## Operational policy for invitation-based deployments
 
 - Keep active work until the customer deletes it or the pilot ends. Review inactive records with each pilot customer after 90 days.
 - Keep encrypted daily backups for 30 days, weekly backups for 8 weeks, then expire them. The longest backup retention is 56 days. Configure and verify expiration at the actual backup destination.

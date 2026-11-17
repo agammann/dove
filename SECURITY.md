@@ -5,3 +5,5 @@ For a private security concern, use [GitHub private vulnerability reporting](htt
 Browser v1 stores local records and backup ZIPs without encryption. API keys stay in tab memory and are supplied only to the optional analysis request. Review the [data and storage guide](docs/HOSTED-WORKSPACE.md) and [supported v1 scope](docs/STABILITY.md). The separately runnable Python sample needs its own provider and deployment configuration before customer use.
 
 For routine defects or missing documentation, open a normal issue using fictional data. Dependency audit output is available in CI; run the locked checks and apply available patches when changing dependencies.
+
+The locked Vite development tools were updated to 8.3.7 (browser workspace, Rolldown 1.2.19) and 6.4.6 (Python frontend) for [GHSA-p4f5-76q4-ffq7](https://github.com/vitejs/vite/security/advisories/GHSA-p4f5-76q4-ffq7). The disclosed condition is an explicitly network-exposed development server; the default scripts bind loopback. Audit output alone did not identify this advisory. This does not establish an attack against the deployed Worker or change document handling.

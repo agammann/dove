@@ -1,6 +1,6 @@
 # Dove validation
 
-See [October 7 v1 verification](verification/v1-2026-10-07.md) for the current browser release scope and fresh checks. The dated sample results below remain historical.
+See [October 7 v1 verification](verification/v1-2026-10-07.md) for that release's recorded browser checks and [current scope](STABILITY.md) for supported behavior. The dated verification and sample results below remain historical.
 
 For the published no-login browser workspace, use the [hosted workspace guide](HOSTED-WORKSPACE.md). The Python application guidance and historical checks below describe a separate implementation.
 
