@@ -84,7 +84,7 @@ The shared fictional sample password is `Dove-local-sample-2026!`. It is only fo
 
 ## Walkthrough
 
-1. Choose **Design studio** to fill the sample credentials, click **Sign in**, then open **Brand identity handoff**.
+1. Enter the Design studio email `studio@dove.example` and the fictional sample password shown above, click **Sign in**, then open **Brand identity handoff**.
 2. Review source evidence. Satisfy acceptance, deliverables, agreed amount and billing recipient with explanations; leave the purchase order missing.
 3. Confirm the checklist. Review or edit a request, select the authorized contact, grant follow up permission, then authorize it.
 4. In **Resolve**, inspect simulated provider acceptance. Use **Local inbox** to submit the supplied fictional purchase order reply.
