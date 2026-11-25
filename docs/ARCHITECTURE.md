@@ -1,18 +1,18 @@
 # Dove architecture
 
-This document describes the separate Python application. The published no-login browser workspace uses local storage and no paid AI API; see [browser workspace](HOSTED-WORKSPACE.md).
+This document describes the separate Python application. The published no-login browser workspace stores work locally and offers model-free manual review, device analysis, and optional paid analysis with the visitor's OpenAI key; see [browser workspace](HOSTED-WORKSPACE.md).
 
 Dove runs one configurable paperwork workflow for every business type. The React application is served by FastAPI on the same origin. PostgreSQL stores organization-scoped records, jobs, invitations, sessions and immutable package metadata. A separate Python worker polls durable jobs. Private document objects use opaque keys on a persistent volume outside the web root; they are never served as static files. Five-minute download tokens also require the same authenticated user and organization.
 
 ## Domain records
 
-`organizations`, `users`, `sessions`, and `invitations` are explicit tables. `records` is an indexed, organization-scoped domain store with a `kind`, work identifier, unique deduplication key, timestamp and JSON payload. Kinds include customer, contact, work, document version, requirement, evidence, request, incoming message, decision, package version, delivery attempt, job, activity, usage and webhook receipt. Pydantic validates incoming commands and model output. This compact beta model favors one common transactional workflow over a table for every payload. Schema changes still require a migration and compatibility review.
+`organizations`, `users`, `sessions`, and `invitations` are explicit tables. `records` is an indexed, organization-scoped domain store with a `kind`, work identifier, unique deduplication key, timestamp and JSON payload. Kinds include customer, contact, work, document version, requirement, evidence, request, incoming message, decision, package version, delivery attempt, job, activity, usage and webhook receipt. Pydantic validates incoming commands and model output. This compact model favors one common transactional workflow over a table for every payload. Schema changes still require a migration and compatibility review.
 
 Every private lookup resolves organization and record identity together. Child references are checked against the organization and work item. The worker derives organization scope from persisted jobs, never model output. The only global routing lookup matches a signed provider event to an existing opaque reply address or provider message identifier. Unmatched signed events enter a restricted operations queue; they do not enter a customer workspace.
 
 ## Authentication
 
-Invitation-only account creation uses random expiring invitation tokens stored as SHA-256 hashes and single-use database updates. Passwords use the maintained pwdlib Argon2 implementation. Random session tokens are stored hashed, expire after 12 hours, and use HttpOnly, SameSite=Strict cookies (Secure in production). Same-origin write checks and an explicit action header protect against cross-site writes. Persistent login counters limit attempts by source IP and account. Public beta currently has one operator permission level per organization. CLI access is the deployment operator boundary for issuing invitations and reviewing access requests.
+Invitation-only account creation uses random expiring invitation tokens stored as SHA-256 hashes and single-use database updates. Passwords use the maintained pwdlib Argon2 implementation. Random session tokens are stored hashed, expire after 12 hours, and use HttpOnly, SameSite=Strict cookies (Secure in production). Same-origin write checks and an explicit action header protect against cross-site writes. Persistent login counters limit attempts by source IP and account. The Python application has one operator permission level per organization. CLI access is the deployment operator boundary for issuing invitations and reviewing access requests.
 
 ## Workflow and approval boundaries
 
@@ -32,7 +32,7 @@ Storage counts physical retained objects, including orphaned files awaiting clea
 
 OpenAI also proposes editable request text and grounded reply associations. Drafting reserves a model call before inference and never authorizes sending. Replies still create a human decision if inference fails or the allowance is exhausted. No inferred association satisfies a requirement without review.
 
-All organization mutations take a PostgreSQL organization-row lock. SQLite local mode uses BEGIN IMMEDIATE and is not the deployment database. This intentionally serializes beta organizations; it trades throughput for auditability. Jobs have due times, leases, attempt counts and visible errors. Normal processing retries at most three times with backoff; manual retries remain subject to model limits. A model call allowance is reserved before inference, even if the inference later fails.
+All organization mutations take a PostgreSQL organization-row lock. SQLite local mode uses BEGIN IMMEDIATE and is not the deployment database. This intentionally serializes organization mutations; it trades throughput for auditability. Jobs have due times, leases, attempt counts and visible errors. Normal processing retries at most three times with backoff; manual retries remain subject to model limits. A model call allowance is reserved before inference, even if the inference later fails.
 
 Email sending first commits an attempt in `sending`, then calls the provider once with an idempotency key. A crashed/expired sending intent becomes `uncertain`. An unknown response never automatically repeats the external action. Known IDs can be reconciled against Resend; no-ID uncertainty requires provider investigation. Definite rejections can be manually retried at most three times. Provider acceptance, delivery events, bounces, failure, customer acceptance and payment are separate concepts.
 
@@ -43,4 +43,4 @@ Email sending first commits an attempt in `sending`, then calls the provider onc
 - Private volume-backed object adapter; distributed S3 storage is an extension point, not configured in this release.
 - No OCR, full inbox sync, accounting ledger, payment processing, automatic tax decisions or native mobile app.
 - HTML email is not rendered as active content. Unsupported attachments require a readable replacement.
-- The model adapter's live accuracy and the provider-specific inbound/attachment behavior require an authorized integration test before beta.
+- The model adapter's live accuracy and the provider-specific inbound/attachment behavior require an authorized integration test before customer use.

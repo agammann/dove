@@ -100,6 +100,14 @@ jobs:
         if: always()
         run: docker compose down --volumes
 
+  postgres-upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Rehearse synthetic PostgreSQL upgrade and rollback
+        run: bash scripts/test_postgres_major_upgrade.sh
+
   browser-workspace:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -264,7 +272,7 @@ jobs:
           path: verification-artifacts/
 
   publish:
-    needs: [frontend-windows, python-native-compatibility, python-sample, browser-workspace, source-release]
+    needs: [frontend-windows, python-native-compatibility, python-sample, postgres-upgrade, browser-workspace, source-release]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
