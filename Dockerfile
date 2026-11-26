@@ -1,4 +1,4 @@
-FROM node:26.13.0-alpine AS frontend
+FROM node:26.13.1-alpine AS frontend
 WORKDIR /frontend
 RUN npm install --global pnpm@10.16.1
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
